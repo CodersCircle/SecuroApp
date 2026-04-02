@@ -1,0 +1,78 @@
+name: securo_app
+description: SecuroApp - Password Manager & 2FA Authenticator
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.3.0 <4.0.0'
+  flutter: '>=3.22.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Database
+  drift: ^2.20.2
+  drift_flutter: ^0.2.0
+  sqlite3_flutter_libs: ^0.5.24
+
+  # Encryption
+  encrypt: ^5.0.3
+  crypto: ^3.0.3
+  pointycastle: ^3.9.1
+
+  # Biometrics
+  local_auth: ^2.3.0
+
+  # TOTP / 2FA
+  otp: ^3.1.4
+
+  # ✅ FIXED: 5.2.3 → 6.0.0 — fixes Kotlin/Gradle conflict with Flutter 3.41
+  mobile_scanner: ^6.0.0
+
+  # QR Generator
+  qr_flutter: ^4.1.0
+
+  # Import / Export
+  file_picker: ^8.1.2
+  path_provider: ^2.1.4
+  permission_handler: ^11.3.1
+  csv: ^6.0.0
+  excel: ^4.0.6
+
+  # ✅ FIXED: 10.0.0 → 10.1.0 — fixes AGP 8.6+ conflict
+  share_plus: ^10.1.0
+
+  # Google Drive Backup
+  google_sign_in: ^6.2.1
+  googleapis: ^13.2.0
+  http: ^1.2.2
+
+  # UI / UX
+  flutter_svg: ^2.0.10
+  cached_network_image: ^3.4.1
+  flutter_secure_storage: ^9.2.2
+  shared_preferences: ^2.3.2
+
+  # Notifications + Image
+  flutter_local_notifications: ^20.1.0
+  image_picker: ^1.2.1
+  image_cropper: ^12.1.1
+
+  # Utils
+  uuid: ^4.4.2
+  intl: ^0.19.0
+  collection: ^1.18.0
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  drift_dev: ^2.20.2
+  build_runner: ^2.4.12
+  flutter_lints: ^4.0.0
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icons/
+    - assets/images/
