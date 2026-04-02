@@ -1,5 +1,5 @@
 <div align="center">
-  <img src="screenshots/splash.png" width="120" alt="SecuroApp Logo"/>
+  <img src="screenshots/icon.png" width="120" alt="SecuroApp Logo"/>
 
   # SecuroApp
 
