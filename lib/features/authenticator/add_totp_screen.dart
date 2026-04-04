@@ -2,6 +2,7 @@ import 'package:drift/drift.dart' show Value;
 import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/responsive.dart';
 import '../../database/app_database.dart';
 import '../../main.dart';
 import '../../services/totp_service.dart';
@@ -108,8 +109,7 @@ class _AddTotpScreenState extends State<AddTotpScreen>
                   width: 240,
                   height: 240,
                   decoration: BoxDecoration(
-                    border:
-                    Border.all(color: AppTheme.primary, width: 2),
+                    border: Border.all(color: AppTheme.primary, width: 2),
                     borderRadius: BorderRadius.circular(16),
                   ),
                 ),
@@ -119,37 +119,43 @@ class _AddTotpScreenState extends State<AddTotpScreen>
           // Manual entry tab
           Form(
             key: _formKey,
-            child: ListView(
-              padding: const EdgeInsets.all(16),
-              children: [
-                const SizedBox(height: 8),
-                CustomTextField(
-                  label: 'Issuer (e.g. Google)',
-                  controller: _issuerCtrl,
-                  validator: (v) =>
-                  v == null || v.isEmpty ? 'Required' : null,
+            child: Center(
+              child: ConstrainedBox(
+                constraints:
+                    const BoxConstraints(maxWidth: Responsive.formMaxWidth),
+                child: ListView(
+                  padding: Responsive.pagePadding(context),
+                  children: [
+                    const SizedBox(height: 8),
+                    CustomTextField(
+                      label: 'Issuer (e.g. Google)',
+                      controller: _issuerCtrl,
+                      validator: (v) =>
+                          v == null || v.isEmpty ? 'Required' : null,
+                    ),
+                    const SizedBox(height: 12),
+                    CustomTextField(
+                      label: 'Account Name / Email',
+                      controller: _accountCtrl,
+                      keyboardType: TextInputType.emailAddress,
+                      validator: (v) =>
+                          v == null || v.isEmpty ? 'Required' : null,
+                    ),
+                    const SizedBox(height: 12),
+                    CustomTextField(
+                      label: 'Secret Key',
+                      controller: _secretCtrl,
+                      validator: (v) =>
+                          v == null || v.isEmpty ? 'Required' : null,
+                    ),
+                    const SizedBox(height: 24),
+                    ElevatedButton(
+                      onPressed: _save,
+                      child: const Text('Add Account'),
+                    ),
+                  ],
                 ),
-                const SizedBox(height: 12),
-                CustomTextField(
-                  label: 'Account Name / Email',
-                  controller: _accountCtrl,
-                  keyboardType: TextInputType.emailAddress,
-                  validator: (v) =>
-                  v == null || v.isEmpty ? 'Required' : null,
-                ),
-                const SizedBox(height: 12),
-                CustomTextField(
-                  label: 'Secret Key',
-                  controller: _secretCtrl,
-                  validator: (v) =>
-                  v == null || v.isEmpty ? 'Required' : null,
-                ),
-                const SizedBox(height: 24),
-                ElevatedButton(
-                  onPressed: _save,
-                  child: const Text('Add Account'),
-                ),
-              ],
+              ),
             ),
           ),
         ],

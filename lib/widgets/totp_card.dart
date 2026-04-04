@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
 import '../core/utils/clipboard_util.dart';
+import '../core/utils/responsive.dart';
 import '../database/app_database.dart';
 import '../services/totp_service.dart';
 
@@ -35,8 +36,8 @@ class _TotpCardState extends State<TotpCard> {
         digits: widget.account.digits,
         period: widget.account.period,
       );
-      _remaining = TotpService.instance
-          .secondsRemaining(period: widget.account.period);
+      _remaining =
+          TotpService.instance.secondsRemaining(period: widget.account.period);
     });
   }
 
@@ -77,13 +78,18 @@ class _TotpCardState extends State<TotpCard> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(widget.account.issuer,
-                          style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontWeight: FontWeight.bold,
-                          )),
+                          style:
+                              Theme.of(context).textTheme.titleMedium?.copyWith(
+                                    fontWeight: FontWeight.bold,
+                                  )),
                       Text(widget.account.accountName,
-                          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                          )),
+                          style:
+                              Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: Theme.of(context)
+                                        .colorScheme
+                                        .onSurface
+                                        .withValues(alpha: 0.6),
+                                  )),
                       const SizedBox(height: 8),
                       Text(
                         TotpService.instance.formatCode(_code),
@@ -105,14 +111,20 @@ class _TotpCardState extends State<TotpCard> {
                       SnackBar(
                         content: const Text('OTP copied!'),
                         behavior: SnackBarBehavior.floating,
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                        margin: const EdgeInsets.fromLTRB(24, 0, 24, 100),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
+                        margin: EdgeInsets.fromLTRB(
+                            24, 0, 24, Responsive.isWide(context) ? 24 : 100),
                       ),
                     );
                   },
                   style: IconButton.styleFrom(
-                    backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                    backgroundColor: Theme.of(context)
+                        .colorScheme
+                        .surfaceContainerHighest
+                        .withValues(alpha: 0.5),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(12)),
                   ),
                   icon: const Icon(Icons.copy_all_rounded, size: 22),
                 ),
@@ -129,7 +141,9 @@ class _TotpCardState extends State<TotpCard> {
               minHeight: 4,
               backgroundColor: Colors.transparent,
               valueColor: AlwaysStoppedAnimation(
-                isUrgent ? AppTheme.error : AppTheme.primary.withValues(alpha: 0.6),
+                isUrgent
+                    ? AppTheme.error
+                    : AppTheme.primary.withValues(alpha: 0.6),
               ),
             ),
           ),
