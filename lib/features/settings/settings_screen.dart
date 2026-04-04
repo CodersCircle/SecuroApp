@@ -5,6 +5,7 @@ import 'package:image_picker/image_picker.dart';
 import 'package:securo_app/screens/login_screen.dart';
 import 'package:drift/drift.dart' show Value;
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/responsive.dart';
 import '../../main.dart';
 import '../../services/auth_service.dart';
 import '../../services/drive_backup_service.dart';
@@ -24,7 +25,7 @@ class SettingsScreen extends StatelessWidget {
       child: ConstrainedBox(
         constraints: const BoxConstraints(maxWidth: 800),
         child: ListView(
-          padding: const EdgeInsets.fromLTRB(20, 16, 20, 120),
+          padding: EdgeInsets.fromLTRB(20, 16, 20, context.isMobile ? 120 : 40),
           children: [
             const _ProfileCard(),
             const SizedBox(height: 24),
@@ -36,7 +37,7 @@ class SettingsScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 24),
-           const _SectionHeader(title: 'Vault Management'),
+            const _SectionHeader(title: 'Vault Management'),
             const _SectionCard(
               children: [
                 _SettingsTile(
@@ -93,10 +94,13 @@ class SettingsScreen extends StatelessWidget {
                 opacity: 0.5,
                 child: Column(
                   children: [
-                    const Icon(Icons.shield_rounded, size: 32, color: AppTheme.primary),
+                    const Icon(Icons.shield_rounded,
+                        size: 32, color: AppTheme.primary),
                     const SizedBox(height: 8),
-                    Text('SecuroApp v1.0.0', style: Theme.of(context).textTheme.labelSmall),
-                    Text('AES-256 Military Grade Encryption', style: Theme.of(context).textTheme.labelSmall),
+                    Text('SecuroApp v1.0.0',
+                        style: Theme.of(context).textTheme.labelSmall),
+                    Text('AES-256 Military Grade Encryption',
+                        style: Theme.of(context).textTheme.labelSmall),
                   ],
                 ),
               ),
@@ -119,10 +123,10 @@ class _SectionHeader extends StatelessWidget {
       child: Text(
         title.toUpperCase(),
         style: Theme.of(context).textTheme.labelMedium?.copyWith(
-          color: AppTheme.primary,
-          fontWeight: FontWeight.bold,
-          letterSpacing: 1.2,
-        ),
+              color: AppTheme.primary,
+              fontWeight: FontWeight.bold,
+              letterSpacing: 1.2,
+            ),
       ),
     );
   }
@@ -136,10 +140,17 @@ class _SectionCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       elevation: 0,
-      color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.2),
+      color: Theme.of(context)
+          .colorScheme
+          .surfaceContainerHighest
+          .withValues(alpha: 0.2),
       shape: RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(20),
-        side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.4)),
+        side: BorderSide(
+            color: Theme.of(context)
+                .colorScheme
+                .outlineVariant
+                .withValues(alpha: 0.4)),
       ),
       child: Column(children: children),
     );
@@ -217,7 +228,8 @@ class _ProfileCardState extends State<_ProfileCard> {
                   Text(
                     profile?.email ?? 'Protecting your data',
                     style: TextStyle(
-                        color: Colors.white.withValues(alpha: 0.8), fontSize: 13),
+                        color: Colors.white.withValues(alpha: 0.8),
+                        fontSize: 13),
                   ),
                 ],
               ),
@@ -228,7 +240,8 @@ class _ProfileCardState extends State<_ProfileCard> {
                 color: Colors.white.withValues(alpha: 0.2),
                 shape: BoxShape.circle,
               ),
-              child: const Icon(Icons.edit_rounded, color: Colors.white, size: 18),
+              child:
+                  const Icon(Icons.edit_rounded, color: Colors.white, size: 18),
             ),
           ],
         ),
@@ -252,8 +265,7 @@ class _AvatarWidget extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final hasAvatar =
-        avatarPath != null && File(avatarPath!).existsSync();
+    final hasAvatar = avatarPath != null && File(avatarPath!).existsSync();
 
     return Container(
       width: size,
@@ -263,23 +275,23 @@ class _AvatarWidget extends StatelessWidget {
         borderRadius: BorderRadius.circular(20),
         image: hasAvatar
             ? DecorationImage(
-          image: FileImage(File(avatarPath!)),
-          fit: BoxFit.cover,
-        )
+                image: FileImage(File(avatarPath!)),
+                fit: BoxFit.cover,
+              )
             : null,
       ),
       child: hasAvatar
           ? null
           : Center(
-        child: Text(
-          username.isNotEmpty ? username[0].toUpperCase() : '?',
-          style: TextStyle(
-            color: Colors.white,
-            fontSize: size * 0.4,
-            fontWeight: FontWeight.bold,
-          ),
-        ),
-      ),
+              child: Text(
+                username.isNotEmpty ? username[0].toUpperCase() : '?',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontSize: size * 0.4,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
     );
   }
 }
@@ -377,7 +389,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
       if (_pinCtrl.text.isNotEmpty) {
         await AuthService.instance.saveMpin(_pinCtrl.text);
       }
-      scaffold.showSnackBar(const SnackBar(content: Text('Security settings updated.')));
+      scaffold.showSnackBar(
+          const SnackBar(content: Text('Security settings updated.')));
     }
 
     navigator.pop();
@@ -437,7 +450,8 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
             CustomTextField(
               label: 'Username',
               controller: _usernameCtrl,
-              validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
+              validator: (v) =>
+                  v == null || v.trim().isEmpty ? 'Required' : null,
             ),
             const SizedBox(height: 16),
             CustomTextField(
@@ -477,10 +491,15 @@ class _ProfileEditScreenState extends State<ProfileEditScreen> {
               onPressed: _saving ? null : _save,
               style: FilledButton.styleFrom(
                 padding: const EdgeInsets.symmetric(vertical: 16),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
               ),
               child: _saving
-                  ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                  ? const SizedBox(
+                      width: 24,
+                      height: 24,
+                      child: CircularProgressIndicator(
+                          strokeWidth: 2, color: Colors.white))
                   : const Text('Update Profile'),
             ),
           ],
@@ -517,10 +536,13 @@ class _NotificationTileState extends State<_NotificationTile> {
           color: AppTheme.primary.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(12),
         ),
-        child: const Icon(Icons.notifications_none_rounded, color: AppTheme.primary, size: 22),
+        child: const Icon(Icons.notifications_none_rounded,
+            color: AppTheme.primary, size: 22),
       ),
-      title: const Text('Notifications', style: TextStyle(fontWeight: FontWeight.w600)),
-      subtitle: Text('Manage vault alerts', style: Theme.of(context).textTheme.bodySmall),
+      title: const Text('Notifications',
+          style: TextStyle(fontWeight: FontWeight.w600)),
+      subtitle: Text('Manage vault alerts',
+          style: Theme.of(context).textTheme.bodySmall),
       trailing: Switch.adaptive(
         value: _isEnabled,
         activeTrackColor: AppTheme.primary,
@@ -563,7 +585,7 @@ class _SettingsTile extends StatelessWidget {
       final navigator = Navigator.of(context);
       navigator.pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const LoginScreen()),
-            (_) => false,
+        (_) => false,
       );
       return;
     }
@@ -572,90 +594,117 @@ class _SettingsTile extends StatelessWidget {
 
     // ✅ Initialize EncryptionService before export
     if (!EncryptionService.instance.isInitialized) {
-       scaffold.showSnackBar(const SnackBar(content: Text('Error: Encryption engine not ready. Please restart app.'), backgroundColor: AppTheme.error));
-       return;
+      scaffold.showSnackBar(const SnackBar(
+          content:
+              Text('Error: Encryption engine not ready. Please restart app.'),
+          backgroundColor: AppTheme.error));
+      return;
     }
 
     try {
       if (exportFormat != null) {
-        
         // Let user choose what to export
         final exportChoice = await showDialog<String>(
-          context: context,
-          builder: (ctx) => AlertDialog(
-            title: const Text('Export Data'),
-            content: const Text('What would you like to export?'),
-            actions: [
-              TextButton(onPressed: () => Navigator.pop(ctx, 'vault'), child: const Text('Vault Passwords')),
-              TextButton(onPressed: () => Navigator.pop(ctx, 'auth'), child: const Text('Authenticator Keys')),
-            ]
-          )
-        );
-        
-        if (exportChoice == null) return; // User canceled
-        
-        final svc = ImportExportService.instance;
-        
-        if (exportChoice == 'vault') {
-           final items = await appDatabase.getAllPasswords();
-           if (items.isEmpty) {
-               scaffold.showSnackBar(const SnackBar(content: Text('No passwords to export.'), behavior: SnackBarBehavior.floating));
-               return;
-           }
-           switch (exportFormat) {
-             case 'csv': await svc.exportAsCSV(items);
-             case 'json': await svc.exportAsJSON(items);
-             case 'txt': await svc.exportAsTXT(items);
-           }
-        } else if (exportChoice == 'auth') {
-           scaffold.showSnackBar(const SnackBar(content: Text('Authenticator export coming soon.'), behavior: SnackBarBehavior.floating));
-        }
+            context: context,
+            builder: (ctx) => AlertDialog(
+                    title: const Text('Export Data'),
+                    content: const Text('What would you like to export?'),
+                    actions: [
+                      TextButton(
+                          onPressed: () => Navigator.pop(ctx, 'vault'),
+                          child: const Text('Vault Passwords')),
+                      TextButton(
+                          onPressed: () => Navigator.pop(ctx, 'auth'),
+                          child: const Text('Authenticator Keys')),
+                    ]));
 
+        if (exportChoice == null) return; // User canceled
+
+        final svc = ImportExportService.instance;
+
+        if (exportChoice == 'vault') {
+          final items = await appDatabase.getAllPasswords();
+          if (items.isEmpty) {
+            scaffold.showSnackBar(const SnackBar(
+                content: Text('No passwords to export.'),
+                behavior: SnackBarBehavior.floating));
+            return;
+          }
+          switch (exportFormat) {
+            case 'csv':
+              await svc.exportAsCSV(items);
+            case 'json':
+              await svc.exportAsJSON(items);
+            case 'txt':
+              await svc.exportAsTXT(items);
+          }
+        } else if (exportChoice == 'auth') {
+          scaffold.showSnackBar(const SnackBar(
+              content: Text('Authenticator export coming soon.'),
+              behavior: SnackBarBehavior.floating));
+        }
       } else if (isImport) {
         final rows = await ImportExportService.instance.importFromFile();
         if (rows != null && rows.isNotEmpty) {
           // ACTUALLY IMPORT THE PASSWORDS INTO THE DATABASE
           int successCount = 0;
           for (final row in rows) {
-             final platform = row['platform'] ?? row['Platform Name'] ?? 'Imported';
-             final username = row['username'] ?? row['Username'] ?? '';
-             final passwordRaw = row['password'] ?? row['Password'] ?? '';
-             final group = row['group'] ?? row['Group'] ?? 'Personal';
-             final notes = row['notes'] ?? row['Notes'] ?? '';
+            final platform =
+                row['platform'] ?? row['Platform Name'] ?? 'Imported';
+            final username = row['username'] ?? row['Username'] ?? '';
+            final passwordRaw = row['password'] ?? row['Password'] ?? '';
+            final group = row['group'] ?? row['Group'] ?? 'Personal';
+            final notes = row['notes'] ?? row['Notes'] ?? '';
 
-             if (passwordRaw.isNotEmpty) {
-                 final encrypted = EncryptionService.instance.encrypt(passwordRaw);
-                 await appDatabase.insertPassword(
-                   PasswordItemsCompanion.insert(
-                     platformName: platform,
-                     username: username,
-                     encryptedPassword: encrypted,
-                     notes: Value(notes),
-                     groupName: Value(group),
-                     iconEmoji: const Value('🔑'),
-                     websiteUrl: const Value(''),
-                   )
-                 );
-                 successCount++;
-             }
+            if (passwordRaw.isNotEmpty) {
+              final encrypted = EncryptionService.instance.encrypt(passwordRaw);
+              await appDatabase.insertPassword(PasswordItemsCompanion.insert(
+                platformName: platform,
+                username: username,
+                encryptedPassword: encrypted,
+                notes: Value(notes),
+                groupName: Value(group),
+                iconEmoji: const Value('🔑'),
+                websiteUrl: const Value(''),
+              ));
+              successCount++;
+            }
           }
           await NotificationService.instance.notifyImportComplete(successCount);
-          scaffold.showSnackBar(SnackBar(content: Text('$successCount entries imported successfully.'), backgroundColor: AppTheme.success, behavior: SnackBarBehavior.floating));
+          scaffold.showSnackBar(SnackBar(
+              content: Text('$successCount entries imported successfully.'),
+              backgroundColor: AppTheme.success,
+              behavior: SnackBarBehavior.floating));
         } else if (rows != null && rows.isEmpty) {
-          scaffold.showSnackBar(const SnackBar(content: Text('No valid entries found to import.'), backgroundColor: AppTheme.warning, behavior: SnackBarBehavior.floating));
+          scaffold.showSnackBar(const SnackBar(
+              content: Text('No valid entries found to import.'),
+              backgroundColor: AppTheme.warning,
+              behavior: SnackBarBehavior.floating));
         }
       } else if (isDriveBackup) {
-        scaffold.showSnackBar(const SnackBar(content: Text('Starting Google Drive backup...'), behavior: SnackBarBehavior.floating));
+        scaffold.showSnackBar(const SnackBar(
+            content: Text('Starting Google Drive backup...'),
+            behavior: SnackBarBehavior.floating));
         final ok = await DriveBackupService.instance.backupToDrive();
         if (ok) {
           await NotificationService.instance.notifyBackupComplete();
-          scaffold.showSnackBar(const SnackBar(content: Text('Backup successful!'), backgroundColor: AppTheme.success, behavior: SnackBarBehavior.floating));
+          scaffold.showSnackBar(const SnackBar(
+              content: Text('Backup successful!'),
+              backgroundColor: AppTheme.success,
+              behavior: SnackBarBehavior.floating));
         } else {
-          scaffold.showSnackBar(const SnackBar(content: Text('Backup failed. Please check Google Sign-In setup.'), backgroundColor: AppTheme.error, behavior: SnackBarBehavior.floating));
+          scaffold.showSnackBar(const SnackBar(
+              content:
+                  Text('Backup failed. Please check Google Sign-In setup.'),
+              backgroundColor: AppTheme.error,
+              behavior: SnackBarBehavior.floating));
         }
       }
     } catch (e) {
-      scaffold.showSnackBar(SnackBar(content: Text('Error: $e'), backgroundColor: AppTheme.error, behavior: SnackBarBehavior.floating));
+      scaffold.showSnackBar(SnackBar(
+          content: Text('Error: $e'),
+          backgroundColor: AppTheme.error,
+          behavior: SnackBarBehavior.floating));
     }
   }
 
@@ -671,10 +720,25 @@ class _SettingsTile extends StatelessWidget {
         ),
         child: Icon(icon, color: color, size: 22),
       ),
-      title: Text(title, style: TextStyle(fontWeight: FontWeight.w600, color: isLogout ? AppTheme.error : null)),
-      subtitle: subtitle != null ? Text(subtitle!, style: Theme.of(context).textTheme.bodySmall) : null,
-      trailing: trailing ?? (onTap != null || exportFormat != null || isImport || isDriveBackup || isLogout ? const Icon(Icons.chevron_right_rounded, size: 20) : null),
-      onTap: onTap ?? ( (exportFormat != null || isImport || isDriveBackup || isLogout) ? () => _handleTap(context) : null),
+      title: Text(title,
+          style: TextStyle(
+              fontWeight: FontWeight.w600,
+              color: isLogout ? AppTheme.error : null)),
+      subtitle: subtitle != null
+          ? Text(subtitle!, style: Theme.of(context).textTheme.bodySmall)
+          : null,
+      trailing: trailing ??
+          (onTap != null ||
+                  exportFormat != null ||
+                  isImport ||
+                  isDriveBackup ||
+                  isLogout
+              ? const Icon(Icons.chevron_right_rounded, size: 20)
+              : null),
+      onTap: onTap ??
+          ((exportFormat != null || isImport || isDriveBackup || isLogout)
+              ? () => _handleTap(context)
+              : null),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
     );
   }
@@ -696,18 +760,28 @@ class _ThemeTile extends StatelessWidget {
               color: AppTheme.primary.withValues(alpha: 0.1),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: const Icon(Icons.palette_outlined, color: AppTheme.primary, size: 22),
+            child: const Icon(Icons.palette_outlined,
+                color: AppTheme.primary, size: 22),
           ),
-          title: const Text('Theme Mode', style: TextStyle(fontWeight: FontWeight.w600)),
-          subtitle: Text(mode.name.toUpperCase(), style: Theme.of(context).textTheme.bodySmall),
+          title: const Text('Theme Mode',
+              style: TextStyle(fontWeight: FontWeight.w600)),
+          subtitle: Text(mode.name.toUpperCase(),
+              style: Theme.of(context).textTheme.bodySmall),
           trailing: SegmentedButton<ThemeMode>(
             segments: const [
-              ButtonSegment(value: ThemeMode.light, icon: Icon(Icons.light_mode_outlined, size: 16)),
-              ButtonSegment(value: ThemeMode.dark, icon: Icon(Icons.dark_mode_outlined, size: 16)),
-              ButtonSegment(value: ThemeMode.system, icon: Icon(Icons.settings_suggest_outlined, size: 16)),
+              ButtonSegment(
+                  value: ThemeMode.light,
+                  icon: Icon(Icons.light_mode_outlined, size: 16)),
+              ButtonSegment(
+                  value: ThemeMode.dark,
+                  icon: Icon(Icons.dark_mode_outlined, size: 16)),
+              ButtonSegment(
+                  value: ThemeMode.system,
+                  icon: Icon(Icons.settings_suggest_outlined, size: 16)),
             ],
             selected: {mode},
-            onSelectionChanged: (set) => ThemeService.instance.setThemeMode(set.first),
+            onSelectionChanged: (set) =>
+                ThemeService.instance.setThemeMode(set.first),
             showSelectedIcon: false,
             style: const ButtonStyle(visualDensity: VisualDensity.compact),
           ),

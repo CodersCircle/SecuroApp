@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
 import '../../core/utils/clipboard_util.dart';
+import '../../core/utils/responsive.dart';
 
 class GeneratorScreen extends StatefulWidget {
   const GeneratorScreen({super.key});
@@ -37,9 +38,24 @@ class _GeneratorScreenState extends State<GeneratorScreen>
 
   // ── Easy-to-type generator ─────────────────────────────────
   static const _words = [
-    'Tiger', 'Moon', 'River', 'Stone', 'Cloud', 'Flame',
-    'Ocean', 'Storm', 'Eagle', 'Blade', 'Frost', 'Solar',
-    'Comet', 'Delta', 'Pixel', 'Amber', 'Swift', 'Nexus',
+    'Tiger',
+    'Moon',
+    'River',
+    'Stone',
+    'Cloud',
+    'Flame',
+    'Ocean',
+    'Storm',
+    'Eagle',
+    'Blade',
+    'Frost',
+    'Solar',
+    'Comet',
+    'Delta',
+    'Pixel',
+    'Amber',
+    'Swift',
+    'Nexus',
   ];
   static const _symbols = ['@', '#', '!', '\$', '%', '&', '*'];
 
@@ -74,7 +90,7 @@ class _GeneratorScreenState extends State<GeneratorScreen>
     setState(() {
       _generated = List.generate(
         _length,
-            (_) => chars[rng.nextInt(chars.length)],
+        (_) => chars[rng.nextInt(chars.length)],
       ).join();
     });
   }
@@ -87,7 +103,10 @@ class _GeneratorScreenState extends State<GeneratorScreen>
         Container(
           margin: const EdgeInsets.symmetric(horizontal: 20),
           decoration: BoxDecoration(
-            color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+            color: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withValues(alpha: 0.3),
             borderRadius: BorderRadius.circular(16),
           ),
           child: TabBar(
@@ -120,8 +139,7 @@ class _GeneratorScreenState extends State<GeneratorScreen>
                 useNumbers: _useNumbers,
                 useUpper: _useUpper,
                 useLower: _useLower,
-                onLengthChanged: (v) =>
-                    setState(() => _length = v.toInt()),
+                onLengthChanged: (v) => setState(() => _length = v.toInt()),
                 onSymbolsChanged: (v) {
                   setState(() => _useSymbols = v);
                   _generateStrong();
@@ -170,21 +188,28 @@ class _EasyTabState extends State<_EasyTab> {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 120),
+      padding: EdgeInsets.fromLTRB(24, 20, 24, context.isMobile ? 120 : 40),
       child: Column(
         children: [
-          Icon(Icons.auto_awesome_rounded, size: 48, color: AppTheme.primary.withValues(alpha: 0.3)),
+          Icon(Icons.auto_awesome_rounded,
+              size: 48, color: AppTheme.primary.withValues(alpha: 0.3)),
           const SizedBox(height: 16),
           Text(
             'Memorable Passwords',
-            style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+            style: Theme.of(context)
+                .textTheme
+                .titleLarge
+                ?.copyWith(fontWeight: FontWeight.bold),
           ),
           const SizedBox(height: 8),
           Text(
             'Easy to remember, hard to guess',
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-            ),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.6),
+                ),
           ),
           const SizedBox(height: 32),
           _PasswordDisplay(password: _password),
@@ -193,12 +218,14 @@ class _EasyTabState extends State<_EasyTab> {
             children: [
               Expanded(
                 child: FilledButton.tonalIcon(
-                  onPressed: () => setState(() => _password = widget.onGenerate()),
+                  onPressed: () =>
+                      setState(() => _password = widget.onGenerate()),
                   icon: const Icon(Icons.refresh_rounded),
                   label: const Text('Generate'),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                   ),
                 ),
               ),
@@ -212,7 +239,8 @@ class _EasyTabState extends State<_EasyTab> {
                         content: const Text('Copied to clipboard!'),
                         behavior: SnackBarBehavior.floating,
                         margin: const EdgeInsets.fromLTRB(24, 0, 24, 100),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(12)),
                       ),
                     );
                   },
@@ -220,7 +248,8 @@ class _EasyTabState extends State<_EasyTab> {
                   label: const Text('Copy'),
                   style: FilledButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
                   ),
                 ),
               ),
@@ -229,23 +258,35 @@ class _EasyTabState extends State<_EasyTab> {
           const SizedBox(height: 32),
           Card(
             elevation: 0,
-            color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+            color: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withValues(alpha: 0.3),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 children: [
                   Row(
                     children: [
-                      const Icon(Icons.info_outline_rounded, size: 18, color: AppTheme.primary),
+                      const Icon(Icons.info_outline_rounded,
+                          size: 18, color: AppTheme.primary),
                       const SizedBox(width: 8),
-                      Text('How it works', style: Theme.of(context).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.bold)),
+                      Text('How it works',
+                          style: Theme.of(context)
+                              .textTheme
+                              .titleSmall
+                              ?.copyWith(fontWeight: FontWeight.bold)),
                     ],
                   ),
                   const SizedBox(height: 8),
                   Text(
                     'We combine two random words with a special symbol and a number to create a password that is easy for humans to type but difficult for computers to crack.',
-                    style: Theme.of(context).textTheme.bodySmall?.copyWith(height: 1.5),
+                    style: Theme.of(context)
+                        .textTheme
+                        .bodySmall
+                        ?.copyWith(height: 1.5),
                   ),
                 ],
               ),
@@ -288,14 +329,18 @@ class _StrongTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return ListView(
-      padding: const EdgeInsets.fromLTRB(24, 20, 24, 120),
+      padding: EdgeInsets.fromLTRB(24, 20, 24, context.isMobile ? 120 : 40),
       children: [
         _PasswordDisplay(password: generated),
         const SizedBox(height: 24),
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Length', style: Theme.of(context).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.bold)),
+            Text('Length',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleMedium
+                    ?.copyWith(fontWeight: FontWeight.bold)),
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
               decoration: BoxDecoration(
@@ -304,7 +349,8 @@ class _StrongTab extends StatelessWidget {
               ),
               child: Text(
                 '$length',
-                style: const TextStyle(color: AppTheme.primary, fontWeight: FontWeight.bold),
+                style: const TextStyle(
+                    color: AppTheme.primary, fontWeight: FontWeight.bold),
               ),
             ),
           ],
@@ -355,7 +401,8 @@ class _StrongTab extends StatelessWidget {
                 label: const Text('Generate'),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                 ),
               ),
             ),
@@ -369,7 +416,8 @@ class _StrongTab extends StatelessWidget {
                       content: const Text('Copied to clipboard!'),
                       behavior: SnackBarBehavior.floating,
                       margin: const EdgeInsets.fromLTRB(24, 0, 24, 100),
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12)),
                     ),
                   );
                 },
@@ -377,7 +425,8 @@ class _StrongTab extends StatelessWidget {
                 label: const Text('Copy'),
                 style: FilledButton.styleFrom(
                   padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(16)),
                 ),
               ),
             ),
@@ -423,7 +472,10 @@ class _PasswordDisplay extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+        color: Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.3),
         borderRadius: BorderRadius.circular(20),
         border: Border.all(
             color: AppTheme.primary.withValues(alpha: 0.2), width: 1.5),

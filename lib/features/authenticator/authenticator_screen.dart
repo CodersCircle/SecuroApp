@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/responsive.dart';
 import '../../database/app_database.dart';
 import '../../main.dart';
 import '../../services/notification_service.dart';
@@ -35,73 +36,80 @@ class AuthenticatorScreen extends StatelessWidget {
 
                 return isWide
                     ? GridView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 450,
-                    mainAxisExtent: 150,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                  ),
-                  itemCount: accounts.length,
-                  itemBuilder: (ctx, i) {
-                    final account = accounts[i];
-                    return Dismissible(
-                      key: ValueKey(account.id),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        margin: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppTheme.error,
-                          borderRadius: BorderRadius.circular(24),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        gridDelegate:
+                            const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 450,
+                          mainAxisExtent: 150,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
                         ),
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 24),
-                        child: const Icon(Icons.delete_rounded, color: Colors.white, size: 32),
-                      ),
-                      onDismissed: (_) => _deleteTotp(account),
-                      child: TotpCard(
-                        account: account,
-                        onDelete: () => _deleteTotp(account),
-                      ),
-                    );
-                  },
-                )
+                        itemCount: accounts.length,
+                        itemBuilder: (ctx, i) {
+                          final account = accounts[i];
+                          return Dismissible(
+                            key: ValueKey(account.id),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              margin: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppTheme.error,
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 24),
+                              child: const Icon(Icons.delete_rounded,
+                                  color: Colors.white, size: 32),
+                            ),
+                            onDismissed: (_) => _deleteTotp(account),
+                            child: TotpCard(
+                              account: account,
+                              onDelete: () => _deleteTotp(account),
+                            ),
+                          );
+                        },
+                      )
                     : ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
-                  itemCount: accounts.length,
-                  itemBuilder: (ctx, i) {
-                    final account = accounts[i];
-                    return Dismissible(
-                      key: ValueKey(account.id),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        decoration: BoxDecoration(
-                          color: AppTheme.error,
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 24),
-                        child: const Icon(Icons.delete_rounded, color: Colors.white, size: 32),
-                      ),
-                      onDismissed: (_) => _deleteTotp(account),
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: TotpCard(
-                          account: account,
-                          onDelete: () => _deleteTotp(account),
-                        ),
-                      ),
-                    );
-                  },
-                );
+                        padding: EdgeInsets.fromLTRB(
+                            16, 0, 16, context.isMobile ? 120 : 80),
+                        itemCount: accounts.length,
+                        itemBuilder: (ctx, i) {
+                          final account = accounts[i];
+                          return Dismissible(
+                            key: ValueKey(account.id),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              decoration: BoxDecoration(
+                                color: AppTheme.error,
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 24),
+                              child: const Icon(Icons.delete_rounded,
+                                  color: Colors.white, size: 32),
+                            ),
+                            onDismissed: (_) => _deleteTotp(account),
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: TotpCard(
+                                account: account,
+                                onDelete: () => _deleteTotp(account),
+                              ),
+                            ),
+                          );
+                        },
+                      );
               },
             ),
           ),
         ],
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 90),
+        padding: EdgeInsets.only(
+          bottom: context.isMobile ? 90 : 16,
+        ),
         child: FloatingActionButton(
           onPressed: () => Navigator.push(
             context,
@@ -110,7 +118,8 @@ class AuthenticatorScreen extends StatelessWidget {
           elevation: 4,
           backgroundColor: AppTheme.primary,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: const Icon(Icons.add_rounded, size: 28),
         ),
       ),
@@ -128,7 +137,9 @@ class _EmptyAuthState extends StatelessWidget {
         mainAxisSize: MainAxisSize.min,
         children: [
           Icon(Icons.qr_code_2_rounded,
-              size: 80, color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)),
+              size: 80,
+              color:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)),
           const SizedBox(height: 24),
           Text('No 2FA accounts',
               style: Theme.of(context).textTheme.titleLarge),
@@ -136,8 +147,11 @@ class _EmptyAuthState extends StatelessWidget {
           Text('Tap + to scan a QR code or enter a key',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-              )),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.6),
+                  )),
         ],
       ),
     );

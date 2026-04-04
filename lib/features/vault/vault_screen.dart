@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../core/constants/app_constants.dart';
 import '../../core/theme/app_theme.dart';
+import '../../core/utils/responsive.dart';
 import '../../database/app_database.dart';
 import '../../main.dart';
 import '../../services/notification_service.dart';
@@ -56,14 +57,18 @@ class _VaultScreenState extends State<VaultScreen> {
                 var items = snapshot.data!;
 
                 if (_selectedGroup != 'All') {
-                  items = items.where((i) => i.groupName == _selectedGroup).toList();
+                  items = items
+                      .where((i) => i.groupName == _selectedGroup)
+                      .toList();
                 }
 
                 if (_query.isNotEmpty) {
                   final q = _query.toLowerCase();
-                  items = items.where((i) =>
-                  i.platformName.toLowerCase().contains(q) ||
-                      i.username.toLowerCase().contains(q)).toList();
+                  items = items
+                      .where((i) =>
+                          i.platformName.toLowerCase().contains(q) ||
+                          i.username.toLowerCase().contains(q))
+                      .toList();
                 }
 
                 if (items.isEmpty) {
@@ -74,85 +79,93 @@ class _VaultScreenState extends State<VaultScreen> {
 
                 return isWide
                     ? GridView.builder(
-                  padding: const EdgeInsets.symmetric(horizontal: 16),
-                  gridDelegate: const SliverGridDelegateWithMaxCrossAxisExtent(
-                    maxCrossAxisExtent: 450,
-                    mainAxisExtent: 110,
-                    crossAxisSpacing: 12,
-                    mainAxisSpacing: 12,
-                  ),
-                  itemCount: items.length,
-                  itemBuilder: (ctx, i) {
-                    final item = items[i];
-                    return Dismissible(
-                      key: ValueKey(item.id),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        margin: const EdgeInsets.all(8),
-                        decoration: BoxDecoration(
-                          color: AppTheme.error,
-                          borderRadius: BorderRadius.circular(24),
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 8),
+                        gridDelegate:
+                            const SliverGridDelegateWithMaxCrossAxisExtent(
+                          maxCrossAxisExtent: 450,
+                          mainAxisExtent: 110,
+                          crossAxisSpacing: 12,
+                          mainAxisSpacing: 12,
                         ),
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 24),
-                        child: const Icon(Icons.delete_rounded, color: Colors.white, size: 32),
-                      ),
-                      onDismissed: (_) => _deleteItem(item),
-                      child: VaultCard(
-                        item: item,
-                        onTap: () => Navigator.push(
-                          ctx,
-                          MaterialPageRoute(
-                            builder: (_) => PasswordDetailScreen(item: item),
-                          ),
-                        ),
-                        onDelete: () => _deleteItem(item),
-                      ),
-                    );
-                  }
-                )
-                    : ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(16, 0, 16, 120),
-                  itemCount: items.length,
-                  itemBuilder: (ctx, i) {
-                    final item = items[i];
-                    return Dismissible(
-                      key: ValueKey(item.id),
-                      direction: DismissDirection.endToStart,
-                      background: Container(
-                        margin: const EdgeInsets.only(bottom: 12),
-                        decoration: BoxDecoration(
-                          color: AppTheme.error,
-                          borderRadius: BorderRadius.circular(24),
-                        ),
-                        alignment: Alignment.centerRight,
-                        padding: const EdgeInsets.only(right: 24),
-                        child: const Icon(Icons.delete_rounded, color: Colors.white, size: 32),
-                      ),
-                      onDismissed: (_) => _deleteItem(item),
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 12),
-                        child: VaultCard(
-                          item: item,
-                          onTap: () => Navigator.push(
-                            ctx,
-                            MaterialPageRoute(
-                              builder: (_) => PasswordDetailScreen(item: item),
+                        itemCount: items.length,
+                        itemBuilder: (ctx, i) {
+                          final item = items[i];
+                          return Dismissible(
+                            key: ValueKey(item.id),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              margin: const EdgeInsets.all(8),
+                              decoration: BoxDecoration(
+                                color: AppTheme.error,
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 24),
+                              child: const Icon(Icons.delete_rounded,
+                                  color: Colors.white, size: 32),
                             ),
-                          ),
-                          onDelete: () => _deleteItem(item),
-                        ),
-                      ),
-                    );
-                  },
-                );
+                            onDismissed: (_) => _deleteItem(item),
+                            child: VaultCard(
+                              item: item,
+                              onTap: () => Navigator.push(
+                                ctx,
+                                MaterialPageRoute(
+                                  builder: (_) =>
+                                      PasswordDetailScreen(item: item),
+                                ),
+                              ),
+                              onDelete: () => _deleteItem(item),
+                            ),
+                          );
+                        })
+                    : ListView.builder(
+                        padding: EdgeInsets.fromLTRB(
+                            16, 0, 16, context.isMobile ? 120 : 80),
+                        itemCount: items.length,
+                        itemBuilder: (ctx, i) {
+                          final item = items[i];
+                          return Dismissible(
+                            key: ValueKey(item.id),
+                            direction: DismissDirection.endToStart,
+                            background: Container(
+                              margin: const EdgeInsets.only(bottom: 12),
+                              decoration: BoxDecoration(
+                                color: AppTheme.error,
+                                borderRadius: BorderRadius.circular(24),
+                              ),
+                              alignment: Alignment.centerRight,
+                              padding: const EdgeInsets.only(right: 24),
+                              child: const Icon(Icons.delete_rounded,
+                                  color: Colors.white, size: 32),
+                            ),
+                            onDismissed: (_) => _deleteItem(item),
+                            child: Padding(
+                              padding: const EdgeInsets.only(bottom: 12),
+                              child: VaultCard(
+                                item: item,
+                                onTap: () => Navigator.push(
+                                  ctx,
+                                  MaterialPageRoute(
+                                    builder: (_) =>
+                                        PasswordDetailScreen(item: item),
+                                  ),
+                                ),
+                                onDelete: () => _deleteItem(item),
+                              ),
+                            ),
+                          );
+                        },
+                      );
               },
             ),
           ),
         ],
       ),
       floatingActionButton: Padding(
-        padding: const EdgeInsets.only(bottom: 90),
+        padding: EdgeInsets.only(
+          bottom: context.isMobile ? 90 : 16,
+        ),
         child: FloatingActionButton(
           onPressed: () => Navigator.push(
             context,
@@ -161,7 +174,8 @@ class _VaultScreenState extends State<VaultScreen> {
           elevation: 4,
           backgroundColor: AppTheme.primary,
           foregroundColor: Colors.white,
-          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+          shape:
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
           child: const Icon(Icons.add_rounded, size: 28),
         ),
       ),
@@ -172,7 +186,7 @@ class _VaultScreenState extends State<VaultScreen> {
 class _Header extends StatelessWidget {
   final TextEditingController controller;
   final ValueChanged<String> onSearch;
-  
+
   const _Header({required this.controller, required this.onSearch});
 
   @override
@@ -187,18 +201,27 @@ class _Header extends StatelessWidget {
             controller: controller,
             hintText: 'Search passwords...',
             onChanged: onSearch,
-            leading: const Icon(Icons.search_rounded, size: 22, color: Colors.grey),
+            leading:
+                const Icon(Icons.search_rounded, size: 22, color: Colors.grey),
             elevation: WidgetStateProperty.all(0),
             backgroundColor: WidgetStateProperty.all(
-              Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.5),
+              Theme.of(context)
+                  .colorScheme
+                  .surfaceContainerHighest
+                  .withValues(alpha: 0.5),
             ),
             shape: WidgetStateProperty.all(
               RoundedRectangleBorder(
                 borderRadius: BorderRadius.circular(16),
-                side: BorderSide(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
+                side: BorderSide(
+                    color: Theme.of(context)
+                        .colorScheme
+                        .outlineVariant
+                        .withValues(alpha: 0.5)),
               ),
             ),
-            padding: WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 16)),
+            padding: WidgetStateProperty.all(
+                const EdgeInsets.symmetric(horizontal: 16)),
           ),
         ],
       ),
@@ -231,13 +254,19 @@ class _GroupFilterRow extends StatelessWidget {
             showCheckmark: false,
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             labelStyle: TextStyle(
-              color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
+              color: isSelected
+                  ? Colors.white
+                  : Theme.of(context).colorScheme.onSurface,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
             selectedColor: AppTheme.primary,
-            backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest.withValues(alpha: 0.3),
+            backgroundColor: Theme.of(context)
+                .colorScheme
+                .surfaceContainerHighest
+                .withValues(alpha: 0.3),
             side: BorderSide.none,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           );
         },
       ),
@@ -256,16 +285,19 @@ class _EmptyState extends StatelessWidget {
         children: [
           Icon(Icons.lock_reset_rounded,
               size: 80,
-              color: Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)),
+              color:
+                  Theme.of(context).colorScheme.primary.withValues(alpha: 0.2)),
           const SizedBox(height: 24),
-          Text('No items found',
-              style: Theme.of(context).textTheme.titleLarge),
+          Text('No items found', style: Theme.of(context).textTheme.titleLarge),
           const SizedBox(height: 12),
           Text('Try a different search or add a new password',
               textAlign: TextAlign.center,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-              )),
+                    color: Theme.of(context)
+                        .colorScheme
+                        .onSurface
+                        .withValues(alpha: 0.6),
+                  )),
         ],
       ),
     );
