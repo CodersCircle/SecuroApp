@@ -1,5 +1,7 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:io' show Platform;
 
 class NotificationService {
   NotificationService._();
@@ -33,27 +35,30 @@ class NotificationService {
     final prefs = await SharedPreferences.getInstance();
     _enabled = prefs.getBool('notifications_enabled') ?? true;
 
-    const androidSettings =
-    AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const iosSettings = DarwinInitializationSettings();
 
-    const iosSettings = DarwinInitializationSettings(
-      requestAlertPermission: true,
-      requestBadgePermission: true,
-      requestSoundPermission: true,
+    // ✅ Windows initialization with required parameters
+    const windowsSettings = WindowsInitializationSettings(
+      appName: 'SecuroApp',
+      appUserModelId: 'com.securoapp.securo_app',
+      guid: '12345678-1234-1234-1234-123456789abc',
     );
 
+    // ✅ Fix: Use named parameter 'settings' as required by the plugin version
     await _plugin.initialize(
       settings: const InitializationSettings(
         android: androidSettings,
         iOS: iosSettings,
+        windows: windowsSettings,
       ),
       onDidReceiveNotificationResponse: _onResponse,
     );
 
-    if (_enabled) {
+    if (_enabled && !kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
       await _plugin
           .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+              AndroidFlutterLocalNotificationsPlugin>()
           ?.requestNotificationsPermission();
     }
   }
@@ -63,22 +68,20 @@ class NotificationService {
     await prefs.setBool('notifications_enabled', val);
     _enabled = val;
 
-    if (val) {
-      // Re-request permissions if toggled on
+    if (val && !kIsWeb && (Platform.isAndroid || Platform.isIOS)) {
       await _plugin
           .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin>()
+              AndroidFlutterLocalNotificationsPlugin>()
           ?.requestNotificationsPermission();
     }
   }
 
-  void _onResponse(NotificationResponse response) {
-    // Handle notification tap
-  }
+  void _onResponse(NotificationResponse response) {}
 
   Future<void> show(String title, String body) async {
-    if (!_enabled) return; // ✅ Block if disabled
+    if (!_enabled) return;
 
+    // ✅ Fix: Use named arguments for _plugin.show as required
     await _plugin.show(
       id: _idCounter++,
       title: title,
@@ -86,8 +89,6 @@ class NotificationService {
       notificationDetails: _notifDetails,
     );
   }
-
-  // ── Convenience methods ────────────────────────────────────
 
   Future<void> notifyPasswordAdded(String platform) =>
       show('Password Saved', '$platform added to vault.');
