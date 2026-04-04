@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import '../core/theme/app_theme.dart';
+import '../core/utils/responsive.dart';
 import '../services/auth_service.dart';
 import 'home_screen.dart';
 
@@ -60,7 +61,7 @@ class _PostSignupScreenState extends State<PostSignupScreen> {
 
     navigator.pushAndRemoveUntil(
       MaterialPageRoute(builder: (_) => const HomeScreen()),
-          (_) => false,
+      (_) => false,
     );
   }
 
@@ -68,94 +69,100 @@ class _PostSignupScreenState extends State<PostSignupScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(24),
-          children: [
-            const SizedBox(height: 24),
-            const _SetupHeader(),
-            const SizedBox(height: 32),
-            // MPIN Section
-            const _SectionLabel(
-              icon: Icons.pin_outlined,
-              title: 'Set MPIN (Optional)',
-              subtitle: 'Quick 6-digit unlock pin',
-            ),
-            const SizedBox(height: 12),
-            TextFormField(
-              controller: _mpinCtrl,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              maxLength: 6,
-              obscureText: true,
-              obscuringCharacter: '●',
-              decoration: const InputDecoration(
-                labelText: 'MPIN',
-                prefixIcon: Icon(Icons.pin_outlined, size: 20),
-                counterText: '',
-              ),
-              onChanged: (_) => setState(() => _mpinError = null),
-            ),
-            const SizedBox(height: 10),
-            TextFormField(
-              controller: _mpinConfirmCtrl,
-              keyboardType: TextInputType.number,
-              inputFormatters: [FilteringTextInputFormatter.digitsOnly],
-              maxLength: 6,
-              obscureText: true,
-              obscuringCharacter: '●',
-              decoration: const InputDecoration(
-                labelText: 'Confirm MPIN',
-                prefixIcon: Icon(Icons.pin_outlined, size: 20),
-                counterText: '',
-              ),
-            ),
-            if (_mpinError != null) ...[
-              const SizedBox(height: 6),
-              Text(_mpinError!,
-                  style: const TextStyle(
-                      color: AppTheme.error, fontSize: 12)),
-            ],
-            const SizedBox(height: 24),
-            // Biometric Section
-            if (_bioAvailable) ...[
-              const _SectionLabel(
-                icon: Icons.fingerprint_rounded,
-                title: 'Enable Biometrics',
-                subtitle: 'Use fingerprint or Face ID to unlock',
-              ),
-              const SizedBox(height: 8),
-              _BioToggle(
-                value: _bioEnabled,
-                onChanged: (v) => setState(() => _bioEnabled = v),
-              ),
-              const SizedBox(height: 24),
-            ],
-            ElevatedButton(
-              onPressed: _saving ? null : _finish,
-              child: _saving
-                  ? const SizedBox(
-                width: 20,
-                height: 20,
-                child: CircularProgressIndicator(
-                    strokeWidth: 2, color: Colors.white),
-              )
-                  : const Text('Get Started'),
-            ),
-            const SizedBox(height: 12),
-            TextButton(
-              onPressed: _saving
-                  ? null
-                  : () {
-                _mpinCtrl.clear();
-                _mpinConfirmCtrl.clear();
-                _finish();
-              },
-              child: const Text('Skip for now',
-                  style: TextStyle(color: AppTheme.onSurfaceMuted)),
-            ),
-          ],
-        ),
-      ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints:
+                const BoxConstraints(maxWidth: Responsive.formMaxWidth),
+            child: ListView(
+              padding: Responsive.pagePadding(context),
+              children: [
+                const SizedBox(height: 24),
+                const _SetupHeader(),
+                const SizedBox(height: 32),
+                // MPIN Section
+                const _SectionLabel(
+                  icon: Icons.pin_outlined,
+                  title: 'Set MPIN (Optional)',
+                  subtitle: 'Quick 6-digit unlock pin',
+                ),
+                const SizedBox(height: 12),
+                TextFormField(
+                  controller: _mpinCtrl,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  maxLength: 6,
+                  obscureText: true,
+                  obscuringCharacter: '●',
+                  decoration: const InputDecoration(
+                    labelText: 'MPIN',
+                    prefixIcon: Icon(Icons.pin_outlined, size: 20),
+                    counterText: '',
+                  ),
+                  onChanged: (_) => setState(() => _mpinError = null),
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _mpinConfirmCtrl,
+                  keyboardType: TextInputType.number,
+                  inputFormatters: [FilteringTextInputFormatter.digitsOnly],
+                  maxLength: 6,
+                  obscureText: true,
+                  obscuringCharacter: '●',
+                  decoration: const InputDecoration(
+                    labelText: 'Confirm MPIN',
+                    prefixIcon: Icon(Icons.pin_outlined, size: 20),
+                    counterText: '',
+                  ),
+                ),
+                if (_mpinError != null) ...[
+                  const SizedBox(height: 6),
+                  Text(_mpinError!,
+                      style:
+                          const TextStyle(color: AppTheme.error, fontSize: 12)),
+                ],
+                const SizedBox(height: 24),
+                // Biometric Section
+                if (_bioAvailable) ...[
+                  const _SectionLabel(
+                    icon: Icons.fingerprint_rounded,
+                    title: 'Enable Biometrics',
+                    subtitle: 'Use fingerprint or Face ID to unlock',
+                  ),
+                  const SizedBox(height: 8),
+                  _BioToggle(
+                    value: _bioEnabled,
+                    onChanged: (v) => setState(() => _bioEnabled = v),
+                  ),
+                  const SizedBox(height: 24),
+                ],
+                ElevatedButton(
+                  onPressed: _saving ? null : _finish,
+                  child: _saving
+                      ? const SizedBox(
+                          width: 20,
+                          height: 20,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white),
+                        )
+                      : const Text('Get Started'),
+                ),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: _saving
+                      ? null
+                      : () {
+                          _mpinCtrl.clear();
+                          _mpinConfirmCtrl.clear();
+                          _finish();
+                        },
+                  child: const Text('Skip for now',
+                      style: TextStyle(color: AppTheme.onSurfaceMuted)),
+                ),
+              ], // ListView children
+            ), // ListView
+          ), // ConstrainedBox
+        ), // Center
+      ), // SafeArea
     );
   }
 }
@@ -181,7 +188,12 @@ class _SetupHeader extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           'Add quick unlock options',
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 14),
+          style: TextStyle(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.6),
+              fontSize: 14),
         ),
       ],
     );
@@ -225,7 +237,11 @@ class _SectionLabel extends StatelessWidget {
                   )),
               Text(subtitle,
                   style: TextStyle(
-                      color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 12)),
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.6),
+                      fontSize: 12)),
             ],
           ),
         ),
@@ -251,9 +267,10 @@ class _BioToggle extends StatelessWidget {
       child: SwitchListTile(
         contentPadding: EdgeInsets.zero,
         title: Text('Biometric Unlock',
-            style: TextStyle(color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
-        secondary: const Icon(Icons.fingerprint_rounded,
-            color: AppTheme.primary),
+            style: TextStyle(
+                color: Theme.of(context).colorScheme.onSurface, fontSize: 14)),
+        secondary:
+            const Icon(Icons.fingerprint_rounded, color: AppTheme.primary),
         value: value,
         onChanged: onChanged,
         activeThumbColor: AppTheme.primary,

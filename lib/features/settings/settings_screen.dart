@@ -23,9 +23,21 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Center(
       child: ConstrainedBox(
-        constraints: const BoxConstraints(maxWidth: 800),
+        constraints: BoxConstraints(
+          maxWidth: Responsive.adaptive(
+            context,
+            mobile: double.infinity,
+            tablet: 700,
+            desktop: Responsive.contentMaxWidth,
+          ),
+        ),
         child: ListView(
-          padding: EdgeInsets.fromLTRB(20, 16, 20, context.isMobile ? 120 : 40),
+          padding: EdgeInsets.fromLTRB(
+            Responsive.horizontalPadding(context),
+            Responsive.sp4,
+            Responsive.horizontalPadding(context),
+            Responsive.isWide(context) ? Responsive.sp6 : 120,
+          ),
           children: [
             const _ProfileCard(),
             const SizedBox(height: 24),

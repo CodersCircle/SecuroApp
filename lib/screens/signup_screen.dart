@@ -2,6 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:securo_app/screens/post_signup_screen.dart';
 import '../core/theme/app_theme.dart';
+import '../core/utils/responsive.dart';
 import '../services/auth_service.dart';
 import '../widgets/custom_text_field.dart';
 import '../widgets/password_strength_indicator.dart';
@@ -39,8 +40,7 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   String _randomStrong(int length) {
-    const chars =
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
+    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
         '0123456789!@#\$%^&*';
     final rng = Random.secure();
     return List.generate(length, (_) => chars[rng.nextInt(chars.length)])
@@ -71,87 +71,85 @@ class _SignupScreenState extends State<SignupScreen> {
       body: SafeArea(
         child: Form(
           key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.all(24),
-            children: [
-              ConstrainedBox(
-                constraints: const BoxConstraints(maxWidth: 500),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start, // Align content left
-                  children: [
-                    const SizedBox(height: 16),
-                    const _SignupHeader(),
-                    const SizedBox(height: 32),
-                    CustomTextField(
-                      label: 'Username',
-                      controller: _usernameCtrl,
-                      validator: (v) {
-                        if (v == null || v.trim().isEmpty) return 'Required';
-                        if (v.trim().length < 3) return 'Min 3 characters';
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    CustomTextField(
-                      label: 'Email',
-                      controller: _emailCtrl,
-                      keyboardType: TextInputType.emailAddress,
-                      validator: (v) {
-                        if (v == null || v.isEmpty) return 'Required';
-                        if (!v.contains('@')) return 'Enter valid email';
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 12),
-                    _GeneratableField(
-                      label: 'Password',
-                      controller: _passwordCtrl,
-                      obscure: true,
-                      onGenerate: _generatePassword,
-                      validator: (v) {
-                        if (v == null || v.isEmpty) return 'Required';
-                        if (v.length < 8) return 'Min 8 characters';
-                        return null;
-                      },
-                    ),
-                    ValueListenableBuilder<TextEditingValue>(
-                      valueListenable: _passwordCtrl,
-                      builder: (_, val, __) =>
-                          PasswordStrengthIndicator(password: val.text),
-                    ),
-                    const SizedBox(height: 16),
-                    const _VaultKeyInfo(),
-                    const SizedBox(height: 8),
-                    _GeneratableField(
-                      label: 'Vault Key',
-                      controller: _vaultKeyCtrl,
-                      obscure: true,
-                      onGenerate: _generateVaultKey,
-                      validator: (v) {
-                        if (v == null || v.isEmpty) return 'Required';
-                        if (v.length < 12) return 'Min 12 characters';
-                        return null;
-                      },
-                    ),
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: _saving ? null : _submit,
-                      child: _saving
-                          ? const SizedBox(
-                        width: 20,
-                        height: 20,
-                        child: CircularProgressIndicator(
-                            strokeWidth: 2, color: Colors.white),
-                      )
-                          : const Text('Create Account'),
-                    ),
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ),
-      ),
+          child: Center(
+            child: ConstrainedBox(
+              constraints:
+                  const BoxConstraints(maxWidth: Responsive.formMaxWidth),
+              child: ListView(
+                padding: Responsive.pagePadding(context),
+                children: [
+                  const SizedBox(height: 16),
+                  const _SignupHeader(),
+                  const SizedBox(height: 32),
+                  CustomTextField(
+                    label: 'Username',
+                    controller: _usernameCtrl,
+                    validator: (v) {
+                      if (v == null || v.trim().isEmpty) return 'Required';
+                      if (v.trim().length < 3) return 'Min 3 characters';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  CustomTextField(
+                    label: 'Email',
+                    controller: _emailCtrl,
+                    keyboardType: TextInputType.emailAddress,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Required';
+                      if (!v.contains('@')) return 'Enter valid email';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 12),
+                  _GeneratableField(
+                    label: 'Password',
+                    controller: _passwordCtrl,
+                    obscure: true,
+                    onGenerate: _generatePassword,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Required';
+                      if (v.length < 8) return 'Min 8 characters';
+                      return null;
+                    },
+                  ),
+                  ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _passwordCtrl,
+                    builder: (_, val, __) =>
+                        PasswordStrengthIndicator(password: val.text),
+                  ),
+                  const SizedBox(height: 16),
+                  const _VaultKeyInfo(),
+                  const SizedBox(height: 8),
+                  _GeneratableField(
+                    label: 'Vault Key',
+                    controller: _vaultKeyCtrl,
+                    obscure: true,
+                    onGenerate: _generateVaultKey,
+                    validator: (v) {
+                      if (v == null || v.isEmpty) return 'Required';
+                      if (v.length < 12) return 'Min 12 characters';
+                      return null;
+                    },
+                  ),
+                  const SizedBox(height: 24),
+                  ElevatedButton(
+                    onPressed: _saving ? null : _submit,
+                    child: _saving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                                strokeWidth: 2, color: Colors.white),
+                          )
+                        : const Text('Create Account'),
+                  ),
+                ], // ListView children
+              ), // ListView
+            ), // ConstrainedBox
+          ), // Center
+        ), // Form
+      ), // SafeArea
     );
   }
 }
@@ -177,7 +175,12 @@ class _SignupHeader extends StatelessWidget {
         const SizedBox(height: 4),
         Text(
           'Set up your secure vault',
-          style: TextStyle(color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 14),
+          style: TextStyle(
+              color: Theme.of(context)
+                  .colorScheme
+                  .onSurface
+                  .withValues(alpha: 0.6),
+              fontSize: 14),
         ),
       ],
     );
@@ -194,8 +197,7 @@ class _VaultKeyInfo extends StatelessWidget {
       decoration: BoxDecoration(
         color: AppTheme.primary.withValues(alpha: 0.08),
         borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-            color: AppTheme.primary.withValues(alpha: 0.2)),
+        border: Border.all(color: AppTheme.primary.withValues(alpha: 0.2)),
       ),
       child: Row(
         children: [
@@ -205,9 +207,13 @@ class _VaultKeyInfo extends StatelessWidget {
           Expanded(
             child: Text(
               'Vault Key encrypts all your passwords. '
-                  'Store it safely — it cannot be recovered.',
+              'Store it safely — it cannot be recovered.',
               style: TextStyle(
-                  color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6), fontSize: 12),
+                  color: Theme.of(context)
+                      .colorScheme
+                      .onSurface
+                      .withValues(alpha: 0.6),
+                  fontSize: 12),
             ),
           ),
         ],
