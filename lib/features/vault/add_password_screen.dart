@@ -5,6 +5,7 @@ import '../../core/theme/app_theme.dart';
 import '../../database/app_database.dart';
 import '../../main.dart';
 import '../../services/encryption_service.dart';
+import '../../core/utils/responsive.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../widgets/password_strength_indicator.dart';
 
@@ -35,7 +36,8 @@ class _AddPasswordScreenState extends State<AddPasswordScreen> {
       final item = widget.editItem!;
       _platformCtrl.text = item.platformName;
       _usernameCtrl.text = item.username;
-      _passwordCtrl.text = EncryptionService.instance.decrypt(item.encryptedPassword);
+      _passwordCtrl.text =
+          EncryptionService.instance.decrypt(item.encryptedPassword);
       _urlCtrl.text = item.websiteUrl;
       _notesCtrl.text = item.notes;
       _selectedGroup = item.groupName;
@@ -83,7 +85,8 @@ class _AddPasswordScreenState extends State<AddPasswordScreen> {
     );
 
     if (isEdit) {
-      await appDatabase.updatePassword(companion.copyWith(id: Value(widget.editItem!.id)));
+      await appDatabase
+          .updatePassword(companion.copyWith(id: Value(widget.editItem!.id)));
     } else {
       await appDatabase.insertPassword(companion);
     }
@@ -95,85 +98,106 @@ class _AddPasswordScreenState extends State<AddPasswordScreen> {
   Widget build(BuildContext context) {
     final isEdit = widget.editItem != null;
     return Scaffold(
-      appBar: AppBar(title: Text(isEdit ? 'Edit Vault Entry' : 'New Vault Entry'), centerTitle: true),
+      appBar: AppBar(
+          title: Text(isEdit ? 'Edit Vault Entry' : 'New Vault Entry'),
+          centerTitle: true),
       body: Form(
         key: _formKey,
-        child: ListView(
-          padding: const EdgeInsets.fromLTRB(24, 16, 24, 40),
-          children: [
-            const _SectionTitle(title: 'Categorization'),
-            const SizedBox(height: 12),
-            _GroupChipSelector(selected: _selectedGroup, onChanged: (g) => setState(() => _selectedGroup = g)),
-            const SizedBox(height: 24),
-            const _SectionTitle(title: 'Choose Icon'),
-            const SizedBox(height: 12),
-            _IconPicker(selected: _selectedIcon, onSelect: (e) => setState(() => _selectedIcon = e)),
-            const SizedBox(height: 32),
-            const _SectionTitle(title: 'Platform Info'),
-            const SizedBox(height: 12),
-            CustomTextField(
-              label: 'Platform Name',
-              controller: _platformCtrl,
-              onChanged: _updateIcon,
-              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-            ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              label: 'Username / Email',
-              controller: _usernameCtrl,
-              keyboardType: TextInputType.emailAddress,
-              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-            ),
-            const SizedBox(height: 32),
-            const _SectionTitle(title: 'Security'),
-            const SizedBox(height: 12),
-            CustomTextField(
-              label: 'Password',
-              controller: _passwordCtrl,
-              obscureText: true,
-              showToggle: true,
-              validator: (v) => v == null || v.isEmpty ? 'Required' : null,
-            ),
-            ValueListenableBuilder<TextEditingValue>(
-              valueListenable: _passwordCtrl,
-              builder: (_, val, __) => PasswordStrengthIndicator(password: val.text),
-            ),
-            const SizedBox(height: 32),
-            const _SectionTitle(title: 'Additional Details'),
-            const SizedBox(height: 12),
-            CustomTextField(
-              label: 'Website URL',
-              controller: _urlCtrl,
-              keyboardType: TextInputType.url,
-              validator: (v) {
-                if (v == null || v.isEmpty) return null;
-                final uri = Uri.tryParse(v);
-                if (uri == null || !uri.hasAbsolutePath) return 'Enter a valid URL';
-                return null;
-              },
-            ),
-            const SizedBox(height: 16),
-            CustomTextField(
-              label: 'Notes',
-              controller: _notesCtrl,
-              maxLines: 2,
-            ),
-            const SizedBox(height: 40),
-            FilledButton(
-              onPressed: _saving ? null : _save,
-              style: FilledButton.styleFrom(
-                backgroundColor: AppTheme.primary,
-                padding: const EdgeInsets.symmetric(vertical: 18),
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              ),
-              child: _saving
-                  ? const SizedBox(width: 24, height: 24, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                  : Text(isEdit ? 'Update Entry' : 'Add to Vault', style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-            ),
-          ],
-        ),
-      ),
-    );
+        child: Center(
+          child: ConstrainedBox(
+            constraints:
+                const BoxConstraints(maxWidth: Responsive.formMaxWidth),
+            child: ListView(
+              padding: Responsive.pagePadding(context),
+              children: [
+                const _SectionTitle(title: 'Categorization'),
+                const SizedBox(height: 12),
+                _GroupChipSelector(
+                    selected: _selectedGroup,
+                    onChanged: (g) => setState(() => _selectedGroup = g)),
+                const SizedBox(height: 24),
+                const _SectionTitle(title: 'Choose Icon'),
+                const SizedBox(height: 12),
+                _IconPicker(
+                    selected: _selectedIcon,
+                    onSelect: (e) => setState(() => _selectedIcon = e)),
+                const SizedBox(height: 32),
+                const _SectionTitle(title: 'Platform Info'),
+                const SizedBox(height: 12),
+                CustomTextField(
+                  label: 'Platform Name',
+                  controller: _platformCtrl,
+                  onChanged: _updateIcon,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                ),
+                const SizedBox(height: 16),
+                CustomTextField(
+                  label: 'Username / Email',
+                  controller: _usernameCtrl,
+                  keyboardType: TextInputType.emailAddress,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                ),
+                const SizedBox(height: 32),
+                const _SectionTitle(title: 'Security'),
+                const SizedBox(height: 12),
+                CustomTextField(
+                  label: 'Password',
+                  controller: _passwordCtrl,
+                  obscureText: true,
+                  showToggle: true,
+                  validator: (v) => v == null || v.isEmpty ? 'Required' : null,
+                ),
+                ValueListenableBuilder<TextEditingValue>(
+                  valueListenable: _passwordCtrl,
+                  builder: (_, val, __) =>
+                      PasswordStrengthIndicator(password: val.text),
+                ),
+                const SizedBox(height: 32),
+                const _SectionTitle(title: 'Additional Details'),
+                const SizedBox(height: 12),
+                CustomTextField(
+                  label: 'Website URL',
+                  controller: _urlCtrl,
+                  keyboardType: TextInputType.url,
+                  validator: (v) {
+                    if (v == null || v.isEmpty) return null;
+                    final uri = Uri.tryParse(v);
+                    if (uri == null || !uri.hasAbsolutePath)
+                      return 'Enter a valid URL';
+                    return null;
+                  },
+                ),
+                const SizedBox(height: 16),
+                CustomTextField(
+                  label: 'Notes',
+                  controller: _notesCtrl,
+                  maxLines: 2,
+                ),
+                const SizedBox(height: 40),
+                FilledButton(
+                  onPressed: _saving ? null : _save,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: AppTheme.primary,
+                    padding: const EdgeInsets.symmetric(vertical: 18),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16)),
+                  ),
+                  child: _saving
+                      ? const SizedBox(
+                          width: 24,
+                          height: 24,
+                          child: CircularProgressIndicator(
+                              strokeWidth: 2, color: Colors.white))
+                      : Text(isEdit ? 'Update Entry' : 'Add to Vault',
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
+              ], // ListView children
+            ), // ListView
+          ), // ConstrainedBox
+        ), // Center
+      ), // Form
+    ); // Scaffold
   }
 }
 
@@ -217,11 +241,16 @@ class _IconPicker extends StatelessWidget {
               duration: const Duration(milliseconds: 200),
               width: 56,
               decoration: BoxDecoration(
-                color: isSelected ? AppTheme.primary : Theme.of(context).colorScheme.surfaceContainerHighest,
+                color: isSelected
+                    ? AppTheme.primary
+                    : Theme.of(context).colorScheme.surfaceContainerHighest,
                 borderRadius: BorderRadius.circular(16),
-                border: Border.all(color: isSelected ? AppTheme.primary : Colors.transparent, width: 2),
+                border: Border.all(
+                    color: isSelected ? AppTheme.primary : Colors.transparent,
+                    width: 2),
               ),
-              child: Center(child: Text(e, style: const TextStyle(fontSize: 20))),
+              child:
+                  Center(child: Text(e, style: const TextStyle(fontSize: 20))),
             ),
           );
         },
@@ -248,16 +277,22 @@ class _GroupChipSelector extends StatelessWidget {
             child: ChoiceChip(
               label: Text(g),
               selected: isSelected,
-              onSelected: (v) { if (v) onChanged(g); },
+              onSelected: (v) {
+                if (v) onChanged(g);
+              },
               showCheckmark: false,
               side: BorderSide.none,
-              backgroundColor: Theme.of(context).colorScheme.surfaceContainerHighest,
+              backgroundColor:
+                  Theme.of(context).colorScheme.surfaceContainerHighest,
               selectedColor: AppTheme.primary,
               labelStyle: TextStyle(
-                color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
+                color: isSelected
+                    ? Colors.white
+                    : Theme.of(context).colorScheme.onSurface,
                 fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
               ),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
           );
         }).toList(),

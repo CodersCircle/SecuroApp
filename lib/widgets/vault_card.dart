@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../core/theme/app_theme.dart';
 import '../core/utils/clipboard_util.dart';
+import '../core/utils/responsive.dart';
 import '../database/app_database.dart';
 import '../services/encryption_service.dart';
 
@@ -36,16 +37,19 @@ class VaultCard extends StatelessWidget {
                     Text(
                       item.platformName,
                       style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                        fontWeight: FontWeight.bold,
-                        letterSpacing: -0.2,
-                      ),
+                            fontWeight: FontWeight.bold,
+                            letterSpacing: -0.2,
+                          ),
                     ),
                     const SizedBox(height: 2),
                     Text(
                       item.username,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                        color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.6),
-                      ),
+                            color: Theme.of(context)
+                                .colorScheme
+                                .onSurface
+                                .withValues(alpha: 0.6),
+                          ),
                       overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 8),
@@ -119,15 +123,19 @@ class _CopyButton extends StatelessWidget {
       color: Colors.transparent,
       child: InkWell(
         onTap: () {
-          final decrypted = EncryptionService.instance.decrypt(item.encryptedPassword);
+          final decrypted =
+              EncryptionService.instance.decrypt(item.encryptedPassword);
           ClipboardUtil.copyAndAutoClear(decrypted);
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: const Text('Password copied!', style: TextStyle(color: Colors.white)),
+              content: const Text('Password copied!',
+                  style: TextStyle(color: Colors.white)),
               backgroundColor: AppTheme.primary,
               behavior: SnackBarBehavior.floating,
-              margin: const EdgeInsets.fromLTRB(24, 0, 24, 100), // Above floating bar
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: EdgeInsets.fromLTRB(
+                  24, 0, 24, Responsive.isWide(context) ? 24 : 100),
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
             ),
           );
         },
@@ -135,13 +143,18 @@ class _CopyButton extends StatelessWidget {
         child: Container(
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
-            border: Border.all(color: Theme.of(context).colorScheme.outlineVariant.withValues(alpha: 0.5)),
+            border: Border.all(
+                color: Theme.of(context)
+                    .colorScheme
+                    .outlineVariant
+                    .withValues(alpha: 0.5)),
             borderRadius: BorderRadius.circular(10),
           ),
           child: Icon(
             Icons.copy_rounded,
             size: 18,
-            color: Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
+            color:
+                Theme.of(context).colorScheme.onSurface.withValues(alpha: 0.7),
           ),
         ),
       ),
