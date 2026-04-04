@@ -32,18 +32,24 @@ class AuthenticatorScreen extends StatelessWidget {
                 if (accounts.isEmpty) {
                   return const _EmptyAuthState();
                 }
-                final isWide = MediaQuery.sizeOf(context).width >= 600;
+                final isWide =
+                    MediaQuery.sizeOf(context).width > Responsive.mobileMax;
+                final isDesktop =
+                    MediaQuery.sizeOf(context).width > Responsive.tabletMax;
+                final crossCount = isDesktop
+                    ? 3
+                    : isWide
+                        ? 2
+                        : 1;
 
                 return isWide
                     ? GridView.builder(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        gridDelegate:
-                            const SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 450,
+                        padding: Responsive.listPadding(context),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossCount,
                           mainAxisExtent: 150,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
+                          crossAxisSpacing: Responsive.sp3,
+                          mainAxisSpacing: Responsive.sp3,
                         ),
                         itemCount: accounts.length,
                         itemBuilder: (ctx, i) {
@@ -71,8 +77,7 @@ class AuthenticatorScreen extends StatelessWidget {
                         },
                       )
                     : ListView.builder(
-                        padding: EdgeInsets.fromLTRB(
-                            16, 0, 16, context.isMobile ? 120 : 80),
+                        padding: Responsive.listPadding(context),
                         itemCount: accounts.length,
                         itemBuilder: (ctx, i) {
                           final account = accounts[i];
@@ -107,9 +112,7 @@ class AuthenticatorScreen extends StatelessWidget {
         ],
       ),
       floatingActionButton: Padding(
-        padding: EdgeInsets.only(
-          bottom: context.isMobile ? 90 : 16,
-        ),
+        padding: Responsive.fabPadding(context),
         child: FloatingActionButton(
           onPressed: () => Navigator.push(
             context,

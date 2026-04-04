@@ -75,18 +75,24 @@ class _VaultScreenState extends State<VaultScreen> {
                   return const _EmptyState();
                 }
 
-                final isWide = MediaQuery.sizeOf(context).width >= 600;
+                final isWide =
+                    MediaQuery.sizeOf(context).width > Responsive.mobileMax;
+                final isDesktop =
+                    MediaQuery.sizeOf(context).width > Responsive.tabletMax;
+                final crossCount = isDesktop
+                    ? 3
+                    : isWide
+                        ? 2
+                        : 1;
 
                 return isWide
                     ? GridView.builder(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 16, vertical: 8),
-                        gridDelegate:
-                            const SliverGridDelegateWithMaxCrossAxisExtent(
-                          maxCrossAxisExtent: 450,
+                        padding: Responsive.listPadding(context),
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: crossCount,
                           mainAxisExtent: 110,
-                          crossAxisSpacing: 12,
-                          mainAxisSpacing: 12,
+                          crossAxisSpacing: Responsive.sp3,
+                          mainAxisSpacing: Responsive.sp3,
                         ),
                         itemCount: items.length,
                         itemBuilder: (ctx, i) {
@@ -120,8 +126,7 @@ class _VaultScreenState extends State<VaultScreen> {
                           );
                         })
                     : ListView.builder(
-                        padding: EdgeInsets.fromLTRB(
-                            16, 0, 16, context.isMobile ? 120 : 80),
+                        padding: Responsive.listPadding(context),
                         itemCount: items.length,
                         itemBuilder: (ctx, i) {
                           final item = items[i];
@@ -163,9 +168,7 @@ class _VaultScreenState extends State<VaultScreen> {
         ],
       ),
       floatingActionButton: Padding(
-        padding: EdgeInsets.only(
-          bottom: context.isMobile ? 90 : 16,
-        ),
+        padding: Responsive.fabPadding(context),
         child: FloatingActionButton(
           onPressed: () => Navigator.push(
             context,
@@ -192,7 +195,8 @@ class _Header extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.fromLTRB(20, 4, 20, 8),
+      padding: EdgeInsets.fromLTRB(Responsive.horizontalPadding(context), 4,
+          Responsive.horizontalPadding(context), Responsive.sp2),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -241,7 +245,8 @@ class _GroupFilterRow extends StatelessWidget {
       height: 48,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        padding: const EdgeInsets.symmetric(horizontal: 20),
+        padding: EdgeInsets.symmetric(
+            horizontal: Responsive.horizontalPadding(context)),
         itemCount: AppConstants.defaultGroups.length,
         separatorBuilder: (_, __) => const SizedBox(width: 8),
         itemBuilder: (ctx, i) {

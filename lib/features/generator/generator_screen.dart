@@ -101,7 +101,9 @@ class _GeneratorScreenState extends State<GeneratorScreen>
       children: [
         // const SizedBox(height: 12),
         Container(
-          margin: const EdgeInsets.symmetric(horizontal: 20),
+          margin: EdgeInsets.symmetric(
+            horizontal: Responsive.horizontalPadding(context),
+          ),
           decoration: BoxDecoration(
             color: Theme.of(context)
                 .colorScheme
@@ -187,113 +189,120 @@ class _EasyTabState extends State<_EasyTab> {
 
   @override
   Widget build(BuildContext context) {
+    final hp = Responsive.horizontalPadding(context);
+    final bottomPad = Responsive.isWide(context) ? Responsive.sp6 : 120.0;
     return SingleChildScrollView(
-      padding: EdgeInsets.fromLTRB(24, 20, 24, context.isMobile ? 120 : 40),
-      child: Column(
-        children: [
-          Icon(Icons.auto_awesome_rounded,
-              size: 48, color: AppTheme.primary.withValues(alpha: 0.3)),
-          const SizedBox(height: 16),
-          Text(
-            'Memorable Passwords',
-            style: Theme.of(context)
-                .textTheme
-                .titleLarge
-                ?.copyWith(fontWeight: FontWeight.bold),
-          ),
-          const SizedBox(height: 8),
-          Text(
-            'Easy to remember, hard to guess',
-            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.6),
-                ),
-          ),
-          const SizedBox(height: 32),
-          _PasswordDisplay(password: _password),
-          const SizedBox(height: 32),
-          Row(
+      padding: EdgeInsets.fromLTRB(hp, Responsive.sp5, hp, bottomPad),
+      child: Center(
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: Responsive.cardMaxWidth),
+          child: Column(
             children: [
-              Expanded(
-                child: FilledButton.tonalIcon(
-                  onPressed: () =>
-                      setState(() => _password = widget.onGenerate()),
-                  icon: const Icon(Icons.refresh_rounded),
-                  label: const Text('Generate'),
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                  ),
-                ),
+              Icon(Icons.auto_awesome_rounded,
+                  size: 48, color: AppTheme.primary.withValues(alpha: 0.3)),
+              const SizedBox(height: 16),
+              Text(
+                'Memorable Passwords',
+                style: Theme.of(context)
+                    .textTheme
+                    .titleLarge
+                    ?.copyWith(fontWeight: FontWeight.bold),
               ),
-              const SizedBox(width: 12),
-              Expanded(
-                child: FilledButton.icon(
-                  onPressed: () {
-                    ClipboardUtil.copyAndAutoClear(_password);
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(
-                        content: const Text('Copied to clipboard!'),
-                        behavior: SnackBarBehavior.floating,
-                        margin: const EdgeInsets.fromLTRB(24, 0, 24, 100),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(12)),
-                      ),
-                    );
-                  },
-                  icon: const Icon(Icons.copy_rounded),
-                  label: const Text('Copy'),
-                  style: FilledButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(16)),
-                  ),
-                ),
+              const SizedBox(height: 8),
+              Text(
+                'Easy to remember, hard to guess',
+                style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.6),
+                    ),
               ),
-            ],
-          ),
-          const SizedBox(height: 32),
-          Card(
-            elevation: 0,
-            color: Theme.of(context)
-                .colorScheme
-                .surfaceContainerHighest
-                .withValues(alpha: 0.3),
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            child: Padding(
-              padding: const EdgeInsets.all(16),
-              child: Column(
+              const SizedBox(height: 32),
+              _PasswordDisplay(password: _password),
+              const SizedBox(height: 32),
+              Row(
                 children: [
-                  Row(
-                    children: [
-                      const Icon(Icons.info_outline_rounded,
-                          size: 18, color: AppTheme.primary),
-                      const SizedBox(width: 8),
-                      Text('How it works',
-                          style: Theme.of(context)
-                              .textTheme
-                              .titleSmall
-                              ?.copyWith(fontWeight: FontWeight.bold)),
-                    ],
+                  Expanded(
+                    child: FilledButton.tonalIcon(
+                      onPressed: () =>
+                          setState(() => _password = widget.onGenerate()),
+                      icon: const Icon(Icons.refresh_rounded),
+                      label: const Text('Generate'),
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                      ),
+                    ),
                   ),
-                  const SizedBox(height: 8),
-                  Text(
-                    'We combine two random words with a special symbol and a number to create a password that is easy for humans to type but difficult for computers to crack.',
-                    style: Theme.of(context)
-                        .textTheme
-                        .bodySmall
-                        ?.copyWith(height: 1.5),
+                  const SizedBox(width: 12),
+                  Expanded(
+                    child: FilledButton.icon(
+                      onPressed: () {
+                        ClipboardUtil.copyAndAutoClear(_password);
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: const Text('Copied to clipboard!'),
+                            behavior: SnackBarBehavior.floating,
+                            margin: const EdgeInsets.fromLTRB(24, 0, 24, 100),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(12)),
+                          ),
+                        );
+                      },
+                      icon: const Icon(Icons.copy_rounded),
+                      label: const Text('Copy'),
+                      style: FilledButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(16)),
+                      ),
+                    ),
                   ),
                 ],
               ),
-            ),
-          ),
-        ],
-      ),
+              const SizedBox(height: 32),
+              Card(
+                elevation: 0,
+                color: Theme.of(context)
+                    .colorScheme
+                    .surfaceContainerHighest
+                    .withValues(alpha: 0.3),
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(16)),
+                child: Padding(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    children: [
+                      Row(
+                        children: [
+                          const Icon(Icons.info_outline_rounded,
+                              size: 18, color: AppTheme.primary),
+                          const SizedBox(width: 8),
+                          Text('How it works',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleSmall
+                                  ?.copyWith(fontWeight: FontWeight.bold)),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Text(
+                        'We combine two random words with a special symbol and a number to create a password that is easy for humans to type but difficult for computers to crack.',
+                        style: Theme.of(context)
+                            .textTheme
+                            .bodySmall
+                            ?.copyWith(height: 1.5),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ], // Column children
+          ), // Column
+        ), // ConstrainedBox
+      ), // Center
     );
   }
 }
@@ -328,112 +337,120 @@ class _StrongTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListView(
-      padding: EdgeInsets.fromLTRB(24, 20, 24, context.isMobile ? 120 : 40),
-      children: [
-        _PasswordDisplay(password: generated),
-        const SizedBox(height: 24),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+    final hp = Responsive.horizontalPadding(context);
+    final bottomPad = Responsive.isWide(context) ? Responsive.sp6 : 120.0;
+    return Center(
+      child: ConstrainedBox(
+        constraints: const BoxConstraints(maxWidth: Responsive.cardMaxWidth),
+        child: ListView(
+          padding: EdgeInsets.fromLTRB(hp, Responsive.sp5, hp, bottomPad),
           children: [
-            Text('Length',
-                style: Theme.of(context)
-                    .textTheme
-                    .titleMedium
-                    ?.copyWith(fontWeight: FontWeight.bold)),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
-              decoration: BoxDecoration(
-                color: AppTheme.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(8),
-              ),
-              child: Text(
-                '$length',
-                style: const TextStyle(
-                    color: AppTheme.primary, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ],
-        ),
-        SliderTheme(
-          data: SliderTheme.of(context).copyWith(
-            trackHeight: 8,
-            thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
-            overlayShape: const RoundSliderOverlayShape(overlayRadius: 20),
-          ),
-          child: Slider(
-            value: length.toDouble(),
-            min: 8,
-            max: 32,
-            divisions: 24,
-            onChanged: onLengthChanged,
-            onChangeEnd: (_) => onGenerate(),
-          ),
-        ),
-        const SizedBox(height: 12),
-        _ToggleTile(
-            label: 'Uppercase',
-            subtitle: 'ABC...',
-            value: useUpper,
-            onChanged: onUpperChanged),
-        _ToggleTile(
-            label: 'Lowercase',
-            subtitle: 'abc...',
-            value: useLower,
-            onChanged: onLowerChanged),
-        _ToggleTile(
-            label: 'Numbers',
-            subtitle: '123...',
-            value: useNumbers,
-            onChanged: onNumbersChanged),
-        _ToggleTile(
-            label: 'Symbols',
-            subtitle: '!@#...',
-            value: useSymbols,
-            onChanged: onSymbolsChanged),
-        const SizedBox(height: 24),
-        Row(
-          children: [
-            Expanded(
-              child: FilledButton.tonalIcon(
-                onPressed: onGenerate,
-                icon: const Icon(Icons.refresh_rounded),
-                label: const Text('Generate'),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
+            _PasswordDisplay(password: generated),
+            const SizedBox(height: 24),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text('Length',
+                    style: Theme.of(context)
+                        .textTheme
+                        .titleMedium
+                        ?.copyWith(fontWeight: FontWeight.bold)),
+                Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: AppTheme.primary.withValues(alpha: 0.1),
+                    borderRadius: BorderRadius.circular(8),
+                  ),
+                  child: Text(
+                    '$length',
+                    style: const TextStyle(
+                        color: AppTheme.primary, fontWeight: FontWeight.bold),
+                  ),
                 ),
+              ],
+            ),
+            SliderTheme(
+              data: SliderTheme.of(context).copyWith(
+                trackHeight: 8,
+                thumbShape: const RoundSliderThumbShape(enabledThumbRadius: 12),
+                overlayShape: const RoundSliderOverlayShape(overlayRadius: 20),
+              ),
+              child: Slider(
+                value: length.toDouble(),
+                min: 8,
+                max: 32,
+                divisions: 24,
+                onChanged: onLengthChanged,
+                onChangeEnd: (_) => onGenerate(),
               ),
             ),
-            const SizedBox(width: 12),
-            Expanded(
-              child: FilledButton.icon(
-                onPressed: () {
-                  ClipboardUtil.copyAndAutoClear(generated);
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    SnackBar(
-                      content: const Text('Copied to clipboard!'),
-                      behavior: SnackBarBehavior.floating,
-                      margin: const EdgeInsets.fromLTRB(24, 0, 24, 100),
+            const SizedBox(height: 12),
+            _ToggleTile(
+                label: 'Uppercase',
+                subtitle: 'ABC...',
+                value: useUpper,
+                onChanged: onUpperChanged),
+            _ToggleTile(
+                label: 'Lowercase',
+                subtitle: 'abc...',
+                value: useLower,
+                onChanged: onLowerChanged),
+            _ToggleTile(
+                label: 'Numbers',
+                subtitle: '123...',
+                value: useNumbers,
+                onChanged: onNumbersChanged),
+            _ToggleTile(
+                label: 'Symbols',
+                subtitle: '!@#...',
+                value: useSymbols,
+                onChanged: onSymbolsChanged),
+            const SizedBox(height: 24),
+            Row(
+              children: [
+                Expanded(
+                  child: FilledButton.tonalIcon(
+                    onPressed: onGenerate,
+                    icon: const Icon(Icons.refresh_rounded),
+                    label: const Text('Generate'),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
                       shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12)),
+                          borderRadius: BorderRadius.circular(16)),
                     ),
-                  );
-                },
-                icon: const Icon(Icons.copy_rounded),
-                label: const Text('Copy'),
-                style: FilledButton.styleFrom(
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(16)),
+                  ),
                 ),
-              ),
-            ),
-          ],
-        ),
-      ],
-    );
+                const SizedBox(width: 12),
+                Expanded(
+                  child: FilledButton.icon(
+                    onPressed: () {
+                      ClipboardUtil.copyAndAutoClear(generated);
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(
+                          content: const Text('Copied to clipboard!'),
+                          behavior: SnackBarBehavior.floating,
+                          margin: const EdgeInsets.fromLTRB(24, 0, 24, 100),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(12)),
+                        ),
+                      );
+                    },
+                    icon: const Icon(Icons.copy_rounded),
+                    label: const Text('Copy'),
+                    style: FilledButton.styleFrom(
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16)),
+                    ),
+                  ),
+                ),
+              ], // Row children
+            ), // Row
+          ], // ListView children
+        ), // ListView
+      ), // ConstrainedBox
+    ); // Center
   }
 }
 
