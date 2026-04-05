@@ -165,7 +165,7 @@ class _ShowQRTabState extends State<_ShowQRTab> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(Icons.broadcast_on_personal_rounded,
+          const Icon(Icons.broadcast_on_personal_rounded,
               size: 80,
               color: AppTheme.primary),
           const SizedBox(height: 16),

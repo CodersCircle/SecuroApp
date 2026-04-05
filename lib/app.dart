@@ -14,10 +14,9 @@ class SecuroApp extends StatelessWidget {
       title: 'SecuroApp',
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
-      themeMode: ThemeMode.light,
-      home: kIsWeb
-          ? const WebConnectScreen()
-          : const SplashScreen(),
+      darkTheme: AppTheme.darkTheme,
+      themeMode: kIsWeb ? ThemeMode.dark : ThemeMode.system,
+      home: kIsWeb ? const WebConnectScreen() : const SplashScreen(),
     );
   }
 }

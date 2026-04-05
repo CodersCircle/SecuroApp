@@ -134,11 +134,12 @@ class _LinkDeviceScreenState extends State<LinkDeviceScreen> {
       }
 
       // Switch to status page
-      if (mounted)
+      if (mounted) {
         setState(() {
           _page = 1;
           _processing = false;
         });
+      }
     } catch (e) {
       if (!mounted) return;
       setState(() {
@@ -238,9 +239,9 @@ class _LinkDeviceScreenState extends State<LinkDeviceScreen> {
                         .withValues(alpha: 0.55)),
               ),
               const SizedBox(height: 12),
-              _infoRow(Icons.lock_rounded, 'End-to-end encrypted'),
-              const SizedBox(height: 6),
               _infoRow(Icons.timer_off_rounded, 'QR expires in 60 s'),
+              const SizedBox(height: 6),
+              _infoRow(Icons.lock_rounded, 'End-to-end encrypted'),
               const SizedBox(height: 6),
               _infoRow(
                   Icons.visibility_off_rounded, 'Web browser is read-only'),
