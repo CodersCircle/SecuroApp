@@ -294,43 +294,192 @@ class _RightWelcome extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isSyncing = state == LinkState.syncing;
+    final isConnected = state == LinkState.connected;
+
     return Center(
-      child: Padding(
-        padding: const EdgeInsets.all(48),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            Icon(Icons.lock_person_rounded,
-                size: 80, color: AppTheme.primary.withValues(alpha: 0.18)),
-            const SizedBox(height: 28),
-            Text('Your vault will appear here',
-                style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-                    fontWeight: FontWeight.w800,
-                    color: Theme.of(context)
-                        .colorScheme
-                        .onSurface
-                        .withValues(alpha: 0.35))),
-            const SizedBox(height: 12),
-            Text(
-              state == LinkState.syncing
-                  ? 'Receiving encrypted data…'
-                  : state == LinkState.connected
-                      ? 'Connected — waiting for vault data…'
-                      : 'Scan the QR code on the left with your SecuroApp mobile app.',
-              textAlign: TextAlign.center,
-              style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 64, vertical: 48),
+        child: ConstrainedBox(
+          constraints: const BoxConstraints(maxWidth: 520),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // ── Hero badge ──────────────────────────────────
+              Container(
+                width: 72,
+                height: 72,
+                decoration: BoxDecoration(
+                  gradient: LinearGradient(
+                    colors: [
+                      AppTheme.primary,
+                      AppTheme.primary.withValues(alpha: 0.7),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(20),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.primary.withValues(alpha: 0.35),
+                      blurRadius: 24,
+                      offset: const Offset(0, 8),
+                    ),
+                  ],
+                ),
+                child: const Icon(Icons.shield_rounded,
+                    color: Colors.white, size: 36),
+              ),
+              const SizedBox(height: 28),
+
+              // ── Headline ────────────────────────────────────
+              Text(
+                'Welcome Back',
+                style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.w900,
+                      letterSpacing: -1,
+                      color: Theme.of(context).colorScheme.onSurface,
+                    ),
+              ),
+              const SizedBox(height: 10),
+              Text(
+                isSyncing
+                    ? 'Receiving your encrypted vault data…'
+                    : isConnected
+                        ? 'Mobile connected — waiting for vault data…'
+                        : 'Your secure vault is one scan away.\nNo passwords. No credentials. Just your phone.',
+                style: Theme.of(context).textTheme.bodyLarge?.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.55),
+                      height: 1.6,
+                    ),
+              ),
+
+              // ── Syncing indicator ───────────────────────────
+              if (isSyncing) ...[
+                const SizedBox(height: 28),
+                Row(children: [
+                  const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2.5, color: AppTheme.primary),
+                  ),
+                  const SizedBox(width: 12),
+                  Text('Syncing vault…',
+                      style: TextStyle(
+                          color: AppTheme.primary,
+                          fontWeight: FontWeight.w600,
+                          fontSize: 14)),
+                ]),
+              ],
+
+              const SizedBox(height: 44),
+              Divider(
                   color: Theme.of(context)
                       .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.4)),
-            ),
-            if (state == LinkState.syncing) ...[
-              const SizedBox(height: 24),
-              const CircularProgressIndicator(),
+                      .outlineVariant
+                      .withValues(alpha: 0.5)),
+              const SizedBox(height: 32),
+
+              // ── Feature pills ───────────────────────────────
+              Text(
+                'What you can do here',
+                style: Theme.of(context).textTheme.labelLarge?.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.4),
+                      letterSpacing: 0.8,
+                      fontWeight: FontWeight.w700,
+                    ),
+              ),
+              const SizedBox(height: 20),
+              const _FeatureRow(
+                icon: Icons.password_rounded,
+                color: Color(0xFF6C63FF),
+                title: 'View Passwords',
+                subtitle: 'Browse & copy all your saved credentials',
+              ),
+              const SizedBox(height: 16),
+              const _FeatureRow(
+                icon: Icons.qr_code_2_rounded,
+                color: Color(0xFF00BFA5),
+                title: 'TOTP Codes',
+                subtitle: 'Live two-factor authentication codes',
+              ),
+              const SizedBox(height: 16),
+              const _FeatureRow(
+                icon: Icons.lock_rounded,
+                color: Color(0xFFFF6B6B),
+                title: 'End-to-End Encrypted',
+                subtitle: 'AES-256-GCM — your data never leaves unencrypted',
+              ),
+              const SizedBox(height: 16),
+              const _FeatureRow(
+                icon: Icons.link_off_rounded,
+                color: Color(0xFFFFB300),
+                title: 'Zero Credentials',
+                subtitle: 'No username, no password — scan & done',
+              ),
             ],
-          ],
+          ),
         ),
       ),
+    );
+  }
+}
+
+// ── Feature row helper ─────────────────────────────────────────
+
+class _FeatureRow extends StatelessWidget {
+  final IconData icon;
+  final Color color;
+  final String title;
+  final String subtitle;
+  const _FeatureRow(
+      {required this.icon,
+      required this.color,
+      required this.title,
+      required this.subtitle});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Container(
+          width: 44,
+          height: 44,
+          decoration: BoxDecoration(
+            color: color.withValues(alpha: 0.12),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, color: color, size: 22),
+        ),
+        const SizedBox(width: 14),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(title,
+                  style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                      fontWeight: FontWeight.w700,
+                      color: Theme.of(context).colorScheme.onSurface)),
+              const SizedBox(height: 2),
+              Text(subtitle,
+                  style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                      color: Theme.of(context)
+                          .colorScheme
+                          .onSurface
+                          .withValues(alpha: 0.45))),
+            ],
+          ),
+        ),
+      ],
     );
   }
 }
