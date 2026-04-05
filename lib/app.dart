@@ -1,8 +1,10 @@
+import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart';
 import 'core/theme/app_theme.dart';
 import 'screens/splash_screen.dart';
+import 'screens/web_connect_screen.dart';
 
-// Forced light mode by removing dependency on ThemeService
+// Web → QR connect screen only. Mobile → normal auth flow.
 class SecuroApp extends StatelessWidget {
   const SecuroApp({super.key});
 
@@ -13,7 +15,9 @@ class SecuroApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       themeMode: ThemeMode.light,
-      home: const SplashScreen(),
+      home: kIsWeb
+          ? const WebConnectScreen()
+          : const SplashScreen(),
     );
   }
 }

@@ -48,6 +48,14 @@ dependencies:
   googleapis: ^13.2.0
   http: ^1.2.2
 
+  # Network / Sync
+  network_info_plus: ^6.0.0
+  shelf: ^1.4.1
+  shelf_router: ^1.1.4
+  bonsoir: ^6.0.1
+  flutter_blue_plus: ^1.35.2
+  web_socket_channel: ^3.0.3
+
   # UI / UX
   flutter_svg: ^2.0.10
   cached_network_image: ^3.4.1
