@@ -69,56 +69,84 @@ class _LoginScreenState extends State<LoginScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: Responsive.pagePadding(context),
-          child: Center(
-            child: ConstrainedBox(
-              constraints:
-                  const BoxConstraints(maxWidth: Responsive.formMaxWidth),
-              child: Form(
-                key: _formKey,
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const _LoginHeader(),
-                    const SizedBox(height: 32),
-                    TextFormField(
-                      controller: _usernameCtrl,
-                      decoration: const InputDecoration(
-                        labelText: 'Username',
-                        prefixIcon:
-                            Icon(Icons.person_outline_rounded, size: 20),
-                      ),
-                      validator: (v) =>
-                          v == null || v.trim().isEmpty ? 'Required' : null,
-                      textInputAction: TextInputAction.done,
-                      onFieldSubmitted: (_) => _proceed(),
-                    ),
-                    if (_error != null) ...[
-                      const SizedBox(height: 8),
-                      Text(_error!,
-                          style: const TextStyle(
-                              color: AppTheme.error, fontSize: 13)),
-                    ],
-                    const SizedBox(height: 24),
-                    ElevatedButton(
-                      onPressed: _checking ? null : _proceed,
-                      child: _checking
-                          ? const SizedBox(
-                              width: 20,
-                              height: 20,
-                              child: CircularProgressIndicator(
-                                  strokeWidth: 2, color: Colors.white),
-                            )
-                          : const Text('Continue'),
-                    ),
-                  ],
-                ),
-              ),
-            ),
+        child: Center(
+          child: ConstrainedBox(
+            constraints:
+                const BoxConstraints(maxWidth: Responsive.formMaxWidth),
+            child: _isWide(context) ? _wide(context) : _mobile(context),
           ),
         ),
+      ),
+    );
+  }
+
+  bool _isWide(BuildContext context) =>
+      MediaQuery.sizeOf(context).width > Responsive.mobileMax;
+
+  Widget _mobile(BuildContext context) {
+    return Padding(
+      padding: Responsive.pagePadding(context),
+      child: _buildFormContent(context),
+    );
+  }
+
+  Widget _wide(BuildContext context) {
+    return Card(
+      color: Colors.white,
+      elevation: 2,
+      shadowColor: Colors.black.withValues(alpha: 2),
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(30),
+        // side: BorderSide(
+        //   color: const Color(0xFFF3F4F6),
+        //   width: 1,
+        // ),
+      ),
+      margin: Responsive.pagePadding(context),
+      child: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 28),
+        child: _buildFormContent(context),
+      ),
+    );
+  }
+
+  Widget _buildFormContent(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          const SizedBox(height: 8),
+          const _LoginHeader(),
+          const SizedBox(height: 24),
+          TextFormField(
+            controller: _usernameCtrl,
+            decoration: const InputDecoration(
+              labelText: 'Username',
+              prefixIcon: Icon(Icons.person_outline_rounded, size: 20),
+            ),
+            validator: (v) => v == null || v.trim().isEmpty ? 'Required' : null,
+            textInputAction: TextInputAction.done,
+            onFieldSubmitted: (_) => _proceed(),
+          ),
+          if (_error != null) ...[
+            const SizedBox(height: 8),
+            Text(_error!,
+                style: const TextStyle(color: AppTheme.error, fontSize: 13)),
+          ],
+          const SizedBox(height: 16),
+          ElevatedButton(
+            onPressed: _checking ? null : _proceed,
+            child: _checking
+                ? const SizedBox(
+                    width: 20,
+                    height: 20,
+                    child: CircularProgressIndicator(
+                        strokeWidth: 2, color: Colors.white),
+                  )
+                : const Text('Continue'),
+          ),
+        ],
       ),
     );
   }
@@ -132,7 +160,7 @@ class _LoginHeader extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Icon(Icons.shield_rounded, color: AppTheme.primary, size: 52),
+        const Icon(Icons.shield_sharp, color: AppTheme.primary, size: 52),
         const SizedBox(height: 16),
         Text(
           'Welcome Back',

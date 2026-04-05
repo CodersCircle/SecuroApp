@@ -15,6 +15,7 @@ import '../../services/theme_service.dart';
 import '../../widgets/custom_text_field.dart';
 import '../../services/encryption_service.dart';
 import '../../database/app_database.dart';
+import '../../screens/connect_screen.dart';
 
 class SettingsScreen extends StatelessWidget {
   const SettingsScreen({super.key});
@@ -49,6 +50,24 @@ class SettingsScreen extends StatelessWidget {
               ],
             ),
             const SizedBox(height: 24),
+            const _SectionHeader(title: 'Sync & Backup'),
+            const _SectionCard(
+              children: [
+                _SettingsTile(
+                  icon: Icons.devices_rounded,
+                  title: 'Sync & Connect',
+                  subtitle: 'LAN, QR, and mobile connect',
+                  isSyncConnect: true,
+                ),
+                _SettingsTile(
+                  icon: Icons.cloud_done_outlined,
+                  title: 'Google Drive Backup',
+                  subtitle: 'Secure encrypted cloud backup',
+                  isDriveBackup: true,
+                ),
+              ],
+            ),
+            const SizedBox(height: 24),
             const _SectionHeader(title: 'Vault Management'),
             const _SectionCard(
               children: [
@@ -62,12 +81,6 @@ class SettingsScreen extends StatelessWidget {
                   icon: Icons.download_rounded,
                   title: 'Export as CSV',
                   exportFormat: 'csv',
-                ),
-                _SettingsTile(
-                  icon: Icons.cloud_done_outlined,
-                  title: 'Google Drive Backup',
-                  subtitle: 'Secure encrypted cloud backup',
-                  isDriveBackup: true,
                 ),
               ],
             ),
@@ -577,6 +590,7 @@ class _SettingsTile extends StatelessWidget {
   final bool isImport;
   final bool isDriveBackup;
   final bool isLogout;
+  final bool isSyncConnect;
   final Widget? trailing;
   final VoidCallback? onTap;
 
@@ -588,6 +602,7 @@ class _SettingsTile extends StatelessWidget {
     this.isImport = false,
     this.isDriveBackup = false,
     this.isLogout = false,
+    this.isSyncConnect = false,
     this.trailing,
     this.onTap,
   });
@@ -598,6 +613,13 @@ class _SettingsTile extends StatelessWidget {
       navigator.pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const LoginScreen()),
         (_) => false,
+      );
+      return;
+    }
+
+    if (isSyncConnect) {
+      Navigator.of(context).push(
+        MaterialPageRoute(builder: (_) => const ConnectScreen()),
       );
       return;
     }

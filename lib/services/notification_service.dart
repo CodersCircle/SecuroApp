@@ -35,7 +35,8 @@ class NotificationService {
     final prefs = await SharedPreferences.getInstance();
     _enabled = prefs.getBool('notifications_enabled') ?? true;
 
-    const androidSettings = AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings =
+        AndroidInitializationSettings('@mipmap/ic_launcher');
     const iosSettings = DarwinInitializationSettings();
 
     // ✅ Windows initialization with required parameters

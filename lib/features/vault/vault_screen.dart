@@ -194,6 +194,7 @@ class _Header extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isWide = MediaQuery.sizeOf(context).width > Responsive.mobileMax;
     return Padding(
       padding: EdgeInsets.fromLTRB(Responsive.horizontalPadding(context), 4,
           Responsive.horizontalPadding(context), Responsive.sp2),
@@ -201,34 +202,46 @@ class _Header extends StatelessWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           const SizedBox(height: 16),
-          SearchBar(
-            controller: controller,
-            hintText: 'Search passwords...',
-            onChanged: onSearch,
-            leading:
-                const Icon(Icons.search_rounded, size: 22, color: Colors.grey),
-            elevation: WidgetStateProperty.all(0),
-            backgroundColor: WidgetStateProperty.all(
-              Theme.of(context)
-                  .colorScheme
-                  .surfaceContainerHighest
-                  .withValues(alpha: 0.5),
-            ),
-            shape: WidgetStateProperty.all(
-              RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(16),
-                side: BorderSide(
-                    color: Theme.of(context)
-                        .colorScheme
-                        .outlineVariant
-                        .withValues(alpha: 0.5)),
-              ),
-            ),
-            padding: WidgetStateProperty.all(
-                const EdgeInsets.symmetric(horizontal: 16)),
-          ),
+          isWide
+              ? Center(
+                  child: ConstrainedBox(
+                    constraints:
+                        const BoxConstraints(maxWidth: Responsive.formMaxWidth),
+                    child: _buildBar(context),
+                  ),
+                )
+              : _buildBar(context),
         ],
       ),
+    );
+  }
+
+  SearchBar _buildBar(BuildContext context) {
+    return SearchBar(
+      controller: controller,
+      hintText: 'Search passwords...',
+      onChanged: onSearch,
+      leading:
+          const Icon(Icons.search_rounded, size: 22, color: Colors.grey),
+      elevation: WidgetStateProperty.all(0),
+      backgroundColor: WidgetStateProperty.all(
+        Theme.of(context)
+            .colorScheme
+            .surfaceContainerHighest
+            .withValues(alpha: 0.5),
+      ),
+      shape: WidgetStateProperty.all(
+        RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(16),
+          side: BorderSide(
+              color: Theme.of(context)
+                  .colorScheme
+                  .outlineVariant
+                  .withValues(alpha: 0.5)),
+        ),
+      ),
+      padding: WidgetStateProperty.all(
+          const EdgeInsets.symmetric(horizontal: 16)),
     );
   }
 }
@@ -239,9 +252,21 @@ class _GroupFilterRow extends StatelessWidget {
 
   const _GroupFilterRow({required this.selected, required this.onSelect});
 
+  static const Map<String, String> _groupIcons = {
+    'Social Media': '📱',
+    'Work': '💼',
+    'OTT Platforms': '🎬',
+    'Music': '🎵',
+    'Academics': '📚',
+    'Personal': '🔑',
+    'Finance': '🏦',
+  };
+
   @override
   Widget build(BuildContext context) {
-    return SizedBox(
+    final isWide = MediaQuery.sizeOf(context).width > Responsive.mobileMax;
+
+    final content = SizedBox(
       height: 48,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
@@ -253,15 +278,15 @@ class _GroupFilterRow extends StatelessWidget {
           final group = AppConstants.defaultGroups[i];
           final isSelected = selected == group;
           return FilterChip(
+            avatar: Text(_groupIcons[group] ?? '',
+                style: const TextStyle(fontSize: 14)),
             label: Text(group),
             selected: isSelected,
             onSelected: (_) => onSelect(group),
             showCheckmark: false,
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             labelStyle: TextStyle(
-              color: isSelected
-                  ? Colors.white
-                  : Theme.of(context).colorScheme.onSurface,
+              color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
             selectedColor: AppTheme.primary,
@@ -276,6 +301,11 @@ class _GroupFilterRow extends StatelessWidget {
         },
       ),
     );
+
+    return isWide ? Center(child: ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: Responsive.formMaxWidth),
+      child: content,
+    )) : content;
   }
 }
 

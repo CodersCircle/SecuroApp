@@ -7,6 +7,7 @@ import '../features/authenticator/authenticator_screen.dart';
 import '../features/generator/generator_screen.dart';
 import '../features/settings/settings_screen.dart';
 import '../services/totp_service.dart';
+import 'link_device_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -105,19 +106,8 @@ class _HomeScreenState extends State<HomeScreen> {
             Expanded(
               child: Column(
                 children: [
-                  _TopBar(isAuthScreen: _index == 1),
-                  Expanded(
-                    child: Center(
-                      child: ConstrainedBox(
-                        constraints: BoxConstraints(
-                          maxWidth: isDesktop
-                              ? Responsive.contentMaxWidth
-                              : Responsive.cardMaxWidth,
-                        ),
-                        child: _screens[_index],
-                      ),
-                    ),
-                  ),
+                  _TopBar(isAuthScreen: _index == 1, showTitle: false),
+                  Expanded(child: _screens[_index]),
                 ],
               ),
             ),
@@ -130,7 +120,7 @@ class _HomeScreenState extends State<HomeScreen> {
       extendBody: true,
       body: Column(
         children: [
-          _TopBar(isAuthScreen: _index == 1),
+          _TopBar(isAuthScreen: _index == 1, showTitle: true),
           Expanded(child: _screens[_index]),
         ],
       ),
@@ -144,7 +134,9 @@ class _HomeScreenState extends State<HomeScreen> {
 
 class _TopBar extends StatefulWidget {
   final bool isAuthScreen;
-  const _TopBar({required this.isAuthScreen});
+  final bool showTitle;
+
+  const _TopBar({required this.isAuthScreen, this.showTitle = true});
 
   @override
   State<_TopBar> createState() => _TopBarState();
@@ -202,13 +194,15 @@ class _TopBarState extends State<_TopBar> {
         padding: const EdgeInsets.fromLTRB(20, 12, 12, 0),
         child: Row(
           children: [
-            Text(
-              'SecuroApp',
-              style: Theme.of(context).textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.bold,
-                    letterSpacing: -0.5,
-                  ),
-            ),
+            if (widget.showTitle) ...[
+              Text(
+                'SecuroApp',
+                style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: -0.5,
+                    ),
+              ),
+            ],
             const Spacer(),
             if (widget.isAuthScreen) ...[
               Text(
@@ -234,6 +228,14 @@ class _TopBarState extends State<_TopBar> {
               ),
               const SizedBox(width: 8),
             ],
+            IconButton(
+              icon: const Icon(Icons.link_rounded),
+              tooltip: 'Link Device',
+              onPressed: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const LinkDeviceScreen()),
+              ),
+            ),
             IconButton(
               icon: const Icon(Icons.notifications_none_rounded),
               onPressed: () => _showHistory(context),
