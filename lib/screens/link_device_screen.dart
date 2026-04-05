@@ -34,6 +34,7 @@ class _LinkDeviceScreenState extends State<LinkDeviceScreen> {
   StreamSubscription<String>? _errorSub;
   LinkState _state = LinkState.idle;
   String? _errorMsg;
+  bool _dismissed = false; // guard: only pop once
 
   @override
   void initState() {
@@ -51,12 +52,22 @@ class _LinkDeviceScreenState extends State<LinkDeviceScreen> {
   }
 
   void _onState(LinkState s) {
-    if (!mounted) return;
+    if (!mounted || _dismissed) return;
     setState(() => _state = s);
     if (s == LinkState.connected) {
-      // Connected — auto-send vault
-      _sendVault();
+      // Start vault send in background, then dismiss this screen
+      // HomeScreen will show a banner while sync is in progress
+      _sendVaultAndDismiss();
     }
+  }
+
+  Future<void> _sendVaultAndDismiss() async {
+    if (_dismissed) return;
+    _dismissed = true;
+    // Fire-and-forget: kick off the send, then pop immediately
+    // so the user is back on the normal app UI
+    unawaited(_link.sendVaultData());
+    if (mounted) Navigator.of(context).pop();
   }
 
   void _onError(String msg) {
@@ -150,22 +161,15 @@ class _LinkDeviceScreenState extends State<LinkDeviceScreen> {
     }
   }
 
-  Future<void> _sendVault() async {
-    try {
-      await _link.sendVaultData();
-    } catch (_) {
-      // error delivered via errorStream
-    }
-  }
-
   String _deviceLabel() {
     // Simple platform label — could use device_info_plus for real names
     return 'Mobile Device';
   }
 
   Future<void> _disconnect() async {
+    final nav = Navigator.of(context);
     await _link.disconnect();
-    if (mounted) Navigator.of(context).pop();
+    if (mounted) nav.pop();
   }
 
   void _showSnack(String msg) {
@@ -189,10 +193,11 @@ class _LinkDeviceScreenState extends State<LinkDeviceScreen> {
         centerTitle: true,
         leading: BackButton(
           onPressed: () async {
+            final nav = Navigator.of(context);
             if (_state == LinkState.connected || _state == LinkState.syncing) {
               await _link.disconnect();
             }
-            if (mounted) Navigator.of(context).pop();
+            if (mounted) nav.pop();
           },
         ),
       ),

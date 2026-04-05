@@ -91,130 +91,164 @@ class _WebConnectScreenState extends State<WebConnectScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+
     return Scaffold(
-      backgroundColor: Theme.of(context).colorScheme.surface,
+      backgroundColor: cs.surface,
       body: Center(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(32),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(mainAxisSize: MainAxisSize.min, children: [
-                Container(
-                  width: 44,
-                  height: 44,
-                  decoration: BoxDecoration(
-                    color: AppTheme.primary.withValues(alpha: 0.12),
-                    borderRadius: BorderRadius.circular(14),
+          padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 40),
+          child: SizedBox(
+            width: 360,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // ── Brand row ────────────────────────────────
+                Row(children: [
+                  Container(
+                    width: 40,
+                    height: 40,
+                    decoration: BoxDecoration(
+                      color: AppTheme.primary.withValues(alpha: 0.12),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: const Icon(Icons.shield_rounded,
+                        color: AppTheme.primary, size: 22),
                   ),
-                  child: const Icon(Icons.shield_rounded,
-                      color: AppTheme.primary, size: 24),
-                ),
-                const SizedBox(width: 12),
-                Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-                  Text('SecuroApp',
-                      style: Theme.of(context)
-                          .textTheme
-                          .titleLarge
-                          ?.copyWith(fontWeight: FontWeight.w900)),
-                  Text('Web Vault',
-                      style: Theme.of(context).textTheme.labelSmall?.copyWith(
-                          color: Theme.of(context)
-                              .colorScheme
-                              .onSurface
-                              .withValues(alpha: 0.4))),
+                  const SizedBox(width: 12),
+                  Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text('SecuroApp',
+                            style: tt.titleMedium?.copyWith(
+                                fontWeight: FontWeight.w700,
+                                color: cs.onSurface)),
+                        Text('Web Vault',
+                            style: tt.labelSmall?.copyWith(
+                                color: cs.onSurface.withValues(alpha: 0.45),
+                                letterSpacing: 0.4)),
+                      ]),
                 ]),
-              ]),
-              const SizedBox(height: 40),
-              Container(
-                width: 320,
-                padding: const EdgeInsets.all(28),
-                decoration: BoxDecoration(
-                  color: Theme.of(context).colorScheme.surfaceContainerLow,
-                  borderRadius: BorderRadius.circular(28),
-                  border: Border.all(
-                      color: Theme.of(context).colorScheme.outlineVariant,
-                      width: 0.8),
-                  boxShadow: [
-                    BoxShadow(
-                        color: Colors.black.withValues(alpha: 0.08),
-                        blurRadius: 32,
-                        offset: const Offset(0, 8))
-                  ],
-                ),
-                child: Column(mainAxisSize: MainAxisSize.min, children: [
-                  _WcsStatusChip(state: _state),
-                  const SizedBox(height: 24),
-                  SizedBox(
-                    width: 240,
-                    height: 240,
-                    child: _WcsQrArea(
-                        state: _state,
-                        session: _session,
-                        error: _error,
-                        onRefresh: _requestSession),
+
+                const SizedBox(height: 32),
+
+                // ── Card ─────────────────────────────────────
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(24),
+                  decoration: BoxDecoration(
+                    color: cs.surfaceContainerLow,
+                    borderRadius: BorderRadius.circular(24),
+                    border: Border.all(
+                        color: cs.outlineVariant.withValues(alpha: 0.6),
+                        width: 1),
+                    boxShadow: [
+                      BoxShadow(
+                          color: Colors.black.withValues(alpha: 0.06),
+                          blurRadius: 24,
+                          offset: const Offset(0, 6))
+                    ],
                   ),
-                  if (_state == LinkState.waitingForMobile) ...[
-                    const SizedBox(height: 16),
-                    Row(children: [
-                      Expanded(
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(4),
-                          child: LinearProgressIndicator(
-                            value: _qrSecondsLeft / 60,
-                            minHeight: 4,
-                            backgroundColor:
-                                Theme.of(context).colorScheme.outlineVariant,
-                            valueColor: AlwaysStoppedAnimation(
-                                _qrSecondsLeft <= 10
-                                    ? AppTheme.error
-                                    : AppTheme.primary),
-                          ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // Status chip — left aligned
+                      _WcsStatusChip(state: _state),
+                      const SizedBox(height: 20),
+
+                      // QR area — centred within card
+                      Center(
+                        child: SizedBox(
+                          width: 220,
+                          height: 220,
+                          child: _WcsQrArea(
+                              state: _state,
+                              session: _session,
+                              error: _error,
+                              onRefresh: _requestSession),
                         ),
                       ),
-                      const SizedBox(width: 10),
-                      Text('${_qrSecondsLeft}s',
-                          style: TextStyle(
-                              fontSize: 12,
-                              fontWeight: FontWeight.w700,
-                              color: _qrSecondsLeft <= 10
-                                  ? AppTheme.error
-                                  : Theme.of(context)
-                                      .colorScheme
-                                      .onSurface
-                                      .withValues(alpha: 0.45))),
-                    ]),
-                  ],
-                  if (_error != null) ...[
-                    const SizedBox(height: 12),
-                    Text(_error!,
-                        style: const TextStyle(
-                            color: AppTheme.error, fontSize: 12),
-                        textAlign: TextAlign.center),
-                    const SizedBox(height: 8),
-                    TextButton.icon(
-                        onPressed: _requestSession,
-                        icon: const Icon(Icons.refresh_rounded, size: 16),
-                        label: const Text('Try Again')),
-                  ],
-                ]),
-              ),
-              const SizedBox(height: 28),
-              if (_state == LinkState.waitingForMobile ||
-                  _state == LinkState.idle ||
-                  _state == LinkState.connecting)
-                const SizedBox(
-                    width: 320,
-                    child: Column(children: [
-                      _WcsStep(n: '1', text: 'Open SecuroApp on your phone'),
-                      SizedBox(height: 8),
-                      _WcsStep(
-                          n: '2', text: 'Tap the Link Device icon in top bar'),
-                      SizedBox(height: 8),
-                      _WcsStep(
-                          n: '3', text: 'Point your camera at the QR code'),
-                    ])),
-            ],
+
+                      // Countdown bar
+                      if (_state == LinkState.waitingForMobile) ...[
+                        const SizedBox(height: 16),
+                        Row(children: [
+                          Expanded(
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(4),
+                              child: LinearProgressIndicator(
+                                value: _qrSecondsLeft / 60,
+                                minHeight: 4,
+                                backgroundColor: cs.outlineVariant,
+                                valueColor: AlwaysStoppedAnimation(
+                                    _qrSecondsLeft <= 10
+                                        ? AppTheme.error
+                                        : AppTheme.primary),
+                              ),
+                            ),
+                          ),
+                          const SizedBox(width: 10),
+                          Text('${_qrSecondsLeft}s',
+                              style: tt.labelSmall?.copyWith(
+                                  fontWeight: FontWeight.w700,
+                                  color: _qrSecondsLeft <= 10
+                                      ? AppTheme.error
+                                      : cs.onSurface.withValues(alpha: 0.45))),
+                        ]),
+                      ],
+
+                      // Error row
+                      if (_error != null) ...[
+                        const SizedBox(height: 12),
+                        Row(children: [
+                          const Icon(Icons.error_outline_rounded,
+                              size: 14, color: AppTheme.error),
+                          const SizedBox(width: 6),
+                          Expanded(
+                            child: Text(_error!,
+                                style: tt.labelSmall
+                                    ?.copyWith(color: AppTheme.error)),
+                          ),
+                          TextButton(
+                              onPressed: _requestSession,
+                              style: TextButton.styleFrom(
+                                  padding: const EdgeInsets.symmetric(
+                                      horizontal: 8, vertical: 4),
+                                  minimumSize: Size.zero,
+                                  tapTargetSize:
+                                      MaterialTapTargetSize.shrinkWrap),
+                              child: const Text('Retry')),
+                        ]),
+                      ],
+                    ],
+                  ),
+                ),
+
+                const SizedBox(height: 24),
+
+                // ── Steps ─────────────────────────────────────
+                if (_state == LinkState.waitingForMobile ||
+                    _state == LinkState.idle ||
+                    _state == LinkState.connecting) ...[
+                  Text('How to connect',
+                      style: tt.labelMedium?.copyWith(
+                          color: cs.onSurface.withValues(alpha: 0.45),
+                          fontWeight: FontWeight.w600,
+                          letterSpacing: 0.5)),
+                  const SizedBox(height: 12),
+                  const _WcsStep(n: '1', text: 'Open SecuroApp on your phone'),
+                  const SizedBox(height: 10),
+                  const _WcsStep(
+                      n: '2', text: 'Tap the Link Device icon in top bar'),
+                  const SizedBox(height: 10),
+                  const _WcsStep(
+                      n: '3', text: 'Point your camera at the QR code'),
+                ],
+              ],
+            ),
           ),
         ),
       ),
@@ -235,69 +269,69 @@ class _WcsQrArea extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final tt = Theme.of(context).textTheme;
     if (state == LinkState.connecting) {
       return const Center(child: CircularProgressIndicator());
     }
     if (state == LinkState.syncing) {
-      return const Center(
+      return Center(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
-        SizedBox(
-            width: 60,
-            height: 60,
+        const SizedBox(
+            width: 56,
+            height: 56,
             child: CircularProgressIndicator(
                 color: AppTheme.primary, strokeWidth: 3)),
-        SizedBox(height: 16),
-        Text('Syncing vault...',
-            style: TextStyle(fontWeight: FontWeight.w600, fontSize: 14)),
+        const SizedBox(height: 16),
+        Text('Syncing vault…',
+            style: tt.bodyMedium?.copyWith(
+                fontWeight: FontWeight.w600, color: AppTheme.primary)),
       ]));
     }
     if (state == LinkState.connected) {
       return Center(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
         Container(
-            width: 76,
-            height: 76,
+            width: 72,
+            height: 72,
             decoration: BoxDecoration(
                 color: AppTheme.success.withValues(alpha: 0.1),
                 shape: BoxShape.circle),
             child: const Icon(Icons.smartphone_rounded,
-                color: AppTheme.success, size: 42)),
-        const SizedBox(height: 14),
-        const Text('Mobile Connected',
-            style: TextStyle(
-                fontWeight: FontWeight.bold,
-                fontSize: 15,
-                color: AppTheme.success)),
+                color: AppTheme.success, size: 38)),
+        const SizedBox(height: 12),
+        Text('Mobile connected',
+            style: tt.titleSmall?.copyWith(
+                fontWeight: FontWeight.w600, color: AppTheme.success)),
         const SizedBox(height: 4),
-        Text('Waiting for vault data...',
-            style: TextStyle(
-                fontSize: 12, color: Colors.grey.withValues(alpha: 0.7))),
+        Text('Waiting for vault data…',
+            style: tt.bodySmall
+                ?.copyWith(color: AppTheme.success.withValues(alpha: 0.6))),
       ]));
     }
     if (state == LinkState.error || state == LinkState.disconnected) {
       return Center(
           child: Column(mainAxisSize: MainAxisSize.min, children: [
         Icon(Icons.qr_code_rounded,
-            size: 64,
+            size: 56,
             color: Theme.of(context)
                 .colorScheme
                 .onSurface
-                .withValues(alpha: 0.15)),
+                .withValues(alpha: 0.12)),
         const SizedBox(height: 12),
-        TextButton.icon(
-            onPressed: onRefresh,
-            icon: const Icon(Icons.refresh_rounded),
-            label: const Text('Generate QR')),
+        FilledButton.tonal(
+          onPressed: onRefresh,
+          child: const Text('Generate QR'),
+        ),
       ]));
     }
     final qrData = session?.toQrString();
     if (qrData == null) return const Center(child: CircularProgressIndicator());
     return ClipRRect(
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(12),
       child: QrImageView(
         data: qrData,
         version: QrVersions.auto,
-        size: 240,
+        size: 220,
         backgroundColor: Colors.white,
         eyeStyle: const QrEyeStyle(
             eyeShape: QrEyeShape.square, color: Color(0xFF1A1A2E)),
@@ -314,9 +348,10 @@ class _WcsStatusChip extends StatelessWidget {
   const _WcsStatusChip({required this.state});
   @override
   Widget build(BuildContext context) {
+    final tt = Theme.of(context).textTheme;
     final (label, color, icon) = switch (state) {
       LinkState.connecting => (
-          'Connecting...',
+          'Connecting…',
           Colors.amber.shade700,
           Icons.sync_rounded
         ),
@@ -331,7 +366,7 @@ class _WcsStatusChip extends StatelessWidget {
           Icons.smartphone_rounded
         ),
       LinkState.syncing => (
-          'Syncing vault...',
+          'Syncing vault…',
           AppTheme.primary,
           Icons.cloud_sync_rounded
         ),
@@ -345,21 +380,21 @@ class _WcsStatusChip extends StatelessWidget {
           AppTheme.error,
           Icons.error_outline_rounded
         ),
-      _ => ('Starting...', Colors.grey, Icons.circle_outlined),
+      _ => ('Starting…', Colors.grey, Icons.circle_outlined),
     };
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 7),
+      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
       decoration: BoxDecoration(
         color: color.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: color.withValues(alpha: 0.3)),
+        borderRadius: BorderRadius.circular(8),
+        border: Border.all(color: color.withValues(alpha: 0.25)),
       ),
       child: Row(mainAxisSize: MainAxisSize.min, children: [
-        Icon(icon, size: 13, color: color),
+        Icon(icon, size: 14, color: color),
         const SizedBox(width: 6),
         Text(label,
-            style: TextStyle(
-                fontSize: 12, fontWeight: FontWeight.w600, color: color)),
+            style: tt.labelSmall?.copyWith(
+                fontWeight: FontWeight.w600, color: color, letterSpacing: 0.1)),
       ]),
     );
   }
@@ -371,28 +406,28 @@ class _WcsStep extends StatelessWidget {
   const _WcsStep({required this.n, required this.text});
   @override
   Widget build(BuildContext context) {
-    return Row(children: [
+    final cs = Theme.of(context).colorScheme;
+    final tt = Theme.of(context).textTheme;
+    return Row(crossAxisAlignment: CrossAxisAlignment.center, children: [
       Container(
-        width: 26,
-        height: 26,
+        width: 24,
+        height: 24,
         decoration: BoxDecoration(
-            color: AppTheme.primary.withValues(alpha: 0.1),
-            borderRadius: BorderRadius.circular(8)),
+          color: AppTheme.primary.withValues(alpha: 0.12),
+          borderRadius: BorderRadius.circular(6),
+        ),
         child: Center(
-            child: Text(n,
-                style: const TextStyle(
-                    fontSize: 12,
-                    fontWeight: FontWeight.w700,
-                    color: AppTheme.primary))),
+          child: Text(n,
+              style: tt.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w700, color: AppTheme.primary)),
+        ),
       ),
-      const SizedBox(width: 10),
+      const SizedBox(width: 12),
       Expanded(
-          child: Text(text,
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                  color: Theme.of(context)
-                      .colorScheme
-                      .onSurface
-                      .withValues(alpha: 0.6)))),
+        child: Text(text,
+            style: tt.bodyMedium
+                ?.copyWith(color: cs.onSurface.withValues(alpha: 0.65))),
+      ),
     ]);
   }
 }

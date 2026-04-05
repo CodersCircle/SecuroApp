@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:convert';
 import 'package:crypto/crypto.dart';
 import 'package:flutter/foundation.dart';
@@ -23,18 +24,23 @@ class AuthService {
   AuthService._();
   static final AuthService instance = AuthService._();
 
-  static const _storage  = FlutterSecureStorage();
-  final _localAuth        = LocalAuthentication();
+  /// Fires whenever the profile (username/email/avatar) is updated.
+  /// UI widgets can listen to this to refresh without a full rebuild.
+  static final _profileChangeCtrl = StreamController<void>.broadcast();
+  static Stream<void> get profileChangeStream => _profileChangeCtrl.stream;
 
-  static const _kUsername     = 'user_username';
-  static const _kEmail        = 'user_email';
+  static const _storage = FlutterSecureStorage();
+  final _localAuth = LocalAuthentication();
+
+  static const _kUsername = 'user_username';
+  static const _kEmail = 'user_email';
   static const _kPasswordHash = 'user_password_hash';
   static const _kVaultKeyHash = 'user_vault_key_hash';
   // ✅ SECURITY FIX: Store derived key bytes, NOT plain vault key
   static const _kVaultKeyDerived = 'user_vault_key_derived';
-  static const _kMpin         = 'user_mpin_hash';
-  static const _kBioEnabled   = 'user_bio_enabled';
-  static const _kAvatarPath   = 'user_avatar_path';
+  static const _kMpin = 'user_mpin_hash';
+  static const _kBioEnabled = 'user_bio_enabled';
+  static const _kAvatarPath = 'user_avatar_path';
   static const _kIsRegistered = 'user_registered';
 
   // ── Registration ───────────────────────────────────────────
@@ -55,12 +61,12 @@ class AuthService {
     final derivedB64 = base64.encode(derived);
 
     await Future.wait([
-      _storage.write(key: _kUsername,        value: username),
-      _storage.write(key: _kEmail,           value: email),
-      _storage.write(key: _kPasswordHash,    value: _hash(password)),
-      _storage.write(key: _kVaultKeyHash,    value: _hash(vaultKey)),
+      _storage.write(key: _kUsername, value: username),
+      _storage.write(key: _kEmail, value: email),
+      _storage.write(key: _kPasswordHash, value: _hash(password)),
+      _storage.write(key: _kVaultKeyHash, value: _hash(vaultKey)),
       _storage.write(key: _kVaultKeyDerived, value: derivedB64),
-      _storage.write(key: _kIsRegistered,    value: 'true'),
+      _storage.write(key: _kIsRegistered, value: 'true'),
     ]);
 
     await EncryptionService.instance.initializeFromDerived(derived);
@@ -114,8 +120,8 @@ class AuthService {
       );
     } on PlatformException catch (e) {
       if (e.code == auth_error.notAvailable ||
-          e.code == auth_error.notEnrolled  ||
-          e.code == auth_error.lockedOut    ||
+          e.code == auth_error.notEnrolled ||
+          e.code == auth_error.lockedOut ||
           e.code == auth_error.permanentlyLockedOut) {
         debugPrint('Biometric: ${e.code}');
       }
@@ -136,17 +142,16 @@ class AuthService {
   Future<void> saveMpin(String mpin) async =>
       _storage.write(key: _kMpin, value: _hash(mpin));
 
-  Future<bool> get hasMpin async =>
-      (await _storage.read(key: _kMpin)) != null;
+  Future<bool> get hasMpin async => (await _storage.read(key: _kMpin)) != null;
 
   Future<bool> verifyMpin(String mpin) async {
     final stored = await _storage.read(key: _kMpin);
     if (stored == null) return false;
     return stored == _hash(mpin);
   }
-  
+
   Future<void> updateMasterPassword(String newPassword) async {
-     await _storage.write(key: _kPasswordHash, value: _hash(newPassword));
+    await _storage.write(key: _kPasswordHash, value: _hash(newPassword));
   }
 
   // ── Profile ────────────────────────────────────────────────
@@ -154,7 +159,7 @@ class AuthService {
   Future<UserProfile?> getProfile() async {
     final username = await _storage.read(key: _kUsername);
     if (username == null) return null;
-    final email      = await _storage.read(key: _kEmail) ?? '';
+    final email = await _storage.read(key: _kEmail) ?? '';
     final avatarPath = await _storage.read(key: _kAvatarPath);
     return UserProfile(
       username: username,
@@ -169,20 +174,22 @@ class AuthService {
     String? avatarPath,
   }) async {
     await _storage.write(key: _kUsername, value: username);
-    await _storage.write(key: _kEmail,    value: email);
+    await _storage.write(key: _kEmail, value: email);
     if (avatarPath != null) {
       await _storage.write(key: _kAvatarPath, value: avatarPath);
     }
+    _profileChangeCtrl.add(null); // notify listeners
   }
 
-  Future<void> updateAvatarPath(String path) async =>
-      _storage.write(key: _kAvatarPath, value: path);
+  Future<void> updateAvatarPath(String path) async {
+    await _storage.write(key: _kAvatarPath, value: path);
+    _profileChangeCtrl.add(null);
+  }
 
   Future<String> get username async =>
       await _storage.read(key: _kUsername) ?? '';
 
-  Future<String> get email async =>
-      await _storage.read(key: _kEmail) ?? '';
+  Future<String> get email async => await _storage.read(key: _kEmail) ?? '';
 
   // ── Helpers ────────────────────────────────────────────────
 

@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:image_cropper/image_cropper.dart';
@@ -193,11 +194,20 @@ class _ProfileCard extends StatefulWidget {
 
 class _ProfileCardState extends State<_ProfileCard> {
   UserProfile? _profile;
+  StreamSubscription<void>? _profileSub;
 
   @override
   void initState() {
     super.initState();
     _load();
+    // Re-load whenever profile is updated (e.g. after vault sync from mobile)
+    _profileSub = AuthService.profileChangeStream.listen((_) => _load());
+  }
+
+  @override
+  void dispose() {
+    _profileSub?.cancel();
+    super.dispose();
   }
 
   Future<void> _load() async {

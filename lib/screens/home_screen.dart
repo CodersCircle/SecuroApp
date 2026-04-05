@@ -6,6 +6,7 @@ import '../features/vault/vault_screen.dart';
 import '../features/authenticator/authenticator_screen.dart';
 import '../features/generator/generator_screen.dart';
 import '../features/settings/settings_screen.dart';
+import '../services/link_service.dart';
 import '../services/totp_service.dart';
 import 'link_device_screen.dart';
 
@@ -18,6 +19,8 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> {
   int _index = 0;
+  StreamSubscription<LinkState>? _syncSub;
+  bool _isBannerShowing = false;
 
   static const _screens = [
     VaultScreen(),
@@ -25,6 +28,96 @@ class _HomeScreenState extends State<HomeScreen> {
     GeneratorScreen(),
     SettingsScreen(),
   ];
+
+  @override
+  void initState() {
+    super.initState();
+    _syncSub = LinkService.instance.stateStream.listen(_onLinkState);
+  }
+
+  @override
+  void dispose() {
+    _syncSub?.cancel();
+    super.dispose();
+  }
+
+  void _onLinkState(LinkState state) {
+    if (!mounted) return;
+    // Defer to the next frame so HomeScreen's Scaffold is fully active
+    // (the pop() animation from LinkDeviceScreen may still be running)
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (!mounted) return;
+      if (state == LinkState.syncing && !_isBannerShowing) {
+        _isBannerShowing = true;
+        ScaffoldMessenger.of(context).showMaterialBanner(
+          MaterialBanner(
+            padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+            backgroundColor: AppTheme.primary.withValues(alpha: 0.12),
+            dividerColor: Colors.transparent,
+            leading: const SizedBox(
+              width: 20,
+              height: 20,
+              child: CircularProgressIndicator(
+                strokeWidth: 2.5,
+                color: AppTheme.primary,
+              ),
+            ),
+            content: const Text(
+              'Syncing vault to web browser…',
+              style: TextStyle(fontWeight: FontWeight.w600),
+            ),
+            actions: [
+              TextButton(
+                onPressed: () =>
+                    ScaffoldMessenger.of(context).hideCurrentMaterialBanner(),
+                child: const Text('Hide'),
+              ),
+            ],
+          ),
+        );
+      } else if (state == LinkState.connected && _isBannerShowing) {
+        // sync_ack received → done
+        _isBannerShowing = false;
+        ScaffoldMessenger.of(context)
+          ..hideCurrentMaterialBanner()
+          ..showSnackBar(
+            SnackBar(
+              content: const Row(children: [
+                Icon(Icons.check_circle_rounded, color: Colors.white, size: 18),
+                SizedBox(width: 10),
+                Text('Vault synced to web browser ✓'),
+              ]),
+              backgroundColor: AppTheme.success,
+              duration: const Duration(seconds: 3),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          );
+      } else if ((state == LinkState.error ||
+              state == LinkState.disconnected) &&
+          _isBannerShowing) {
+        _isBannerShowing = false;
+        ScaffoldMessenger.of(context)
+          ..hideCurrentMaterialBanner()
+          ..showSnackBar(
+            SnackBar(
+              content: const Row(children: [
+                Icon(Icons.error_outline_rounded,
+                    color: Colors.white, size: 18),
+                SizedBox(width: 10),
+                Text('Vault sync failed — tap Link Device to retry'),
+              ]),
+              backgroundColor: AppTheme.error,
+              duration: const Duration(seconds: 4),
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          );
+      }
+    });
+  }
 
   @override
   Widget build(BuildContext context) {

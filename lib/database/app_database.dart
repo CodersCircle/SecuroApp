@@ -48,6 +48,9 @@ class AppDatabase extends _$AppDatabase {
   Future<int> deletePassword(int id) =>
       (delete(passwordItems)..where((t) => t.id.equals(id))).go();
 
+  /// Wipe all passwords — used before a fresh vault import.
+  Future<void> deleteAllPasswords() => delete(passwordItems).go();
+
   Future<List<PasswordItem>> searchPasswords(
           String query) =>
       (select(passwordItems)
@@ -63,4 +66,7 @@ class AppDatabase extends _$AppDatabase {
 
   Future<int> deleteTotp(int id) =>
       (delete(totpAccounts)..where((t) => t.id.equals(id))).go();
+
+  /// Wipe all TOTP accounts — used before a fresh vault import.
+  Future<void> deleteAllTotp() => delete(totpAccounts).go();
 }

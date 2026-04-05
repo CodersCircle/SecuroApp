@@ -90,7 +90,7 @@ class _VaultScreenState extends State<VaultScreen> {
                         padding: Responsive.listPadding(context),
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: crossCount,
-                          mainAxisExtent: 110,
+                          mainAxisExtent: 120,
                           crossAxisSpacing: Responsive.sp3,
                           mainAxisSpacing: Responsive.sp3,
                         ),
@@ -221,8 +221,7 @@ class _Header extends StatelessWidget {
       controller: controller,
       hintText: 'Search passwords...',
       onChanged: onSearch,
-      leading:
-          const Icon(Icons.search_rounded, size: 22, color: Colors.grey),
+      leading: const Icon(Icons.search_rounded, size: 22, color: Colors.grey),
       elevation: WidgetStateProperty.all(0),
       backgroundColor: WidgetStateProperty.all(
         Theme.of(context)
@@ -240,8 +239,8 @@ class _Header extends StatelessWidget {
                   .withValues(alpha: 0.5)),
         ),
       ),
-      padding: WidgetStateProperty.all(
-          const EdgeInsets.symmetric(horizontal: 16)),
+      padding:
+          WidgetStateProperty.all(const EdgeInsets.symmetric(horizontal: 16)),
     );
   }
 }
@@ -286,7 +285,9 @@ class _GroupFilterRow extends StatelessWidget {
             showCheckmark: false,
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
             labelStyle: TextStyle(
-              color: isSelected ? Colors.white : Theme.of(context).colorScheme.onSurface,
+              color: isSelected
+                  ? Colors.white
+                  : Theme.of(context).colorScheme.onSurface,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
             ),
             selectedColor: AppTheme.primary,
@@ -302,10 +303,14 @@ class _GroupFilterRow extends StatelessWidget {
       ),
     );
 
-    return isWide ? Center(child: ConstrainedBox(
-      constraints: const BoxConstraints(maxWidth: Responsive.formMaxWidth),
-      child: content,
-    )) : content;
+    return isWide
+        ? Center(
+            child: ConstrainedBox(
+            constraints:
+                const BoxConstraints(maxWidth: Responsive.formMaxWidth),
+            child: content,
+          ))
+        : content;
   }
 }
 

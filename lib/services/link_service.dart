@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'dart:math';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:pointycastle/export.dart' as pc;
 import 'package:web_socket_channel/web_socket_channel.dart';
 
@@ -182,7 +183,14 @@ class LinkService {
               })
           .toList();
 
-      final plain = jsonEncode({'passwords': pwMaps, 'totp': totpMaps});
+      // Include user profile so web can show name/email in Settings
+      final profile = await _getProfileData();
+
+      final plain = jsonEncode({
+        'passwords': pwMaps,
+        'totp': totpMaps,
+        'profile': profile,
+      });
 
       // E2EE encrypt
       final encrypted = _encrypt(plain);
@@ -194,6 +202,18 @@ class LinkService {
     } catch (e) {
       _setError('Failed to sync data: $e');
       _setState(LinkState.connected);
+    }
+  }
+
+  /// Read profile data from secure storage for transmission.
+  Future<Map<String, dynamic>> _getProfileData() async {
+    try {
+      const storage = FlutterSecureStorage();
+      final username = await storage.read(key: 'user_username') ?? '';
+      final email = await storage.read(key: 'user_email') ?? '';
+      return {'username': username, 'email': email};
+    } catch (_) {
+      return {};
     }
   }
 

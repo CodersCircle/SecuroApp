@@ -24,15 +24,16 @@ class VaultCard extends StatelessWidget {
         onTap: onTap,
         borderRadius: BorderRadius.circular(24),
         child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
           child: Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               _IconBadge(emoji: item.iconEmoji),
               const SizedBox(width: 16),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisAlignment: MainAxisAlignment.center,
+                  mainAxisSize: MainAxisSize.min,
                   children: [
                     Text(
                       item.platformName,
@@ -40,6 +41,7 @@ class VaultCard extends StatelessWidget {
                             fontWeight: FontWeight.bold,
                             letterSpacing: -0.2,
                           ),
+                      overflow: TextOverflow.ellipsis,
                     ),
                     const SizedBox(height: 2),
                     Text(
@@ -52,7 +54,7 @@ class VaultCard extends StatelessWidget {
                           ),
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 8),
+                    const SizedBox(height: 4),
                     _GroupChip(group: item.groupName),
                   ],
                 ),
