@@ -1,21 +1,22 @@
-/**
- * SecuroApp WebSocket Signaling Server
- * Handles QR-based device linking: Web ↔ Mobile
- *
- * Session lifecycle:
- *   1. Web  → create_session  → server issues session_id + qr_token (60s TTL)
- *   2. QR shown on web contains: { session_id, qr_token, server_url }
- *   3. Mobile scans QR → join_session  → server links both clients
- *   4. Server → both: connected
- *   5. Mobile → sync_data (encrypted)  → server forwards to web as update_data
- *   6. Either side → disconnect_session → server ends session
- */
+
 
 const WebSocket = require('ws');
 const { v4: uuidv4 } = require('uuid');
 const http = require('http');
+const os = require('os');
 
 const PORT = process.env.PORT || 8080;
+
+/** Returns the first non-internal IPv4 address (your LAN IP). */
+function getLanIp() {
+  for (const ifaces of Object.values(os.networkInterfaces())) {
+    for (const iface of ifaces) {
+      if (iface.family === 'IPv4' && !iface.internal) return iface.address;
+    }
+  }
+  return 'localhost';
+}
+const LAN_IP = process.env.HOST_IP || getLanIp();
 const QR_TTL_MS = 60_000;      // QR expires after 60 s
 const SESSION_TTL_MS = 30 * 60_000; // Idle session cleanup after 30 min
 
@@ -111,6 +112,7 @@ wss.on('connection', (ws, req) => {
         session_id: rec.sessionId,
         qr_token:   rec.qrToken,
         expires_in: QR_TTL_MS / 1000,
+        server_url: `ws://${LAN_IP}:${PORT}`,   // ← real IP for mobile QR
       });
       console.log(`[S] Session created: ${rec.sessionId}`);
       return;
@@ -228,9 +230,11 @@ wss.on('connection', (ws, req) => {
   ws.on('error', (err) => console.error(`[!] WS error: ${err.message}`));
 });
 
-server.listen(PORT, () => {
-  console.log(`🔐 SecuroApp Signaling Server running on ws://localhost:${PORT}`);
-  console.log(`   Health: http://localhost:${PORT}/health`);
+server.listen(PORT, '0.0.0.0', () => {
+  console.log(`🔐 SecuroApp Signaling Server`);
+  console.log(`   WS  (local) : ws://localhost:${PORT}`);
+  console.log(`   WS  (mobile): ws://${LAN_IP}:${PORT}  ← use this IP on mobile`);
+  console.log(`   Health      : http://${LAN_IP}:${PORT}/health`);
 });
 
 // Graceful shutdown

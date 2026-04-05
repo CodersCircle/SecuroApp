@@ -234,6 +234,8 @@ class LinkService {
         final sessionId = msg['session_id'] as String;
         final qrToken = msg['qr_token'] as String;
         final expiresIn = (msg['expires_in'] as num).toInt();
+        // Server sends its LAN IP so the QR works from a phone on the same network
+        final serverUrl = (msg['server_url'] as String?) ?? _kServerWs;
 
         // Derive session key from qrToken + sessionId
         _sessionKey = _deriveKey(qrToken + sessionId);
@@ -242,7 +244,7 @@ class LinkService {
           sessionId: sessionId,
           qrToken: qrToken,
           expiresIn: expiresIn,
-          serverUrl: _kServerWs,
+          serverUrl: serverUrl, // ← LAN IP, not localhost
         );
         _setState(LinkState.waitingForMobile);
         break;
@@ -430,7 +432,7 @@ class LinkService {
     if (_sessionKey == null) return encoded;
 
     final parts = encoded.split('.');
-    if (parts.length != 2) throw FormatException('Invalid cipher format');
+    if (parts.length != 2) throw const FormatException('Invalid cipher format');
 
     final key = Uint8List.fromList(_sessionKey!);
     final iv = base64Url.decode(parts[0]);
